@@ -52,8 +52,12 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=optional" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=optional" /></noscript>
 
-  <!-- Main stylesheet — blocking (prevents CLS), already small enough -->
+  <!-- Main stylesheet — inlined to eliminate critical request chain -->
+  {% if inline_css %}
+  <style id="main-css">{{ inline_css | safe }}</style>
+  {% else %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ static_ver }}" />
+  {% endif %}
 
   <!-- Cropper.css — non-blocking (only needed for crop tool) -->
   <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" onload="this.onload=null;this.rel='stylesheet'" />
@@ -81,9 +85,9 @@
     .cat-card:hover{border-color:#6366f1;background:rgba(99,102,241,.1);transform:translateY(-3px)}
     .cat-card .cat-icon{font-size:2.2rem;margin-bottom:.7rem}
     .cat-card h3{font-size:1.05rem;font-weight:700;margin:0 0 .35rem}
-    .cat-card p{font-size:.82rem;color:#64748b;margin:0;line-height:1.6}
+    .cat-card p{font-size:.82rem;color:#94a3b8;margin:0;line-height:1.6}
     /* ── Section label ── */
-    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6366f1;margin-bottom:.5rem}
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#818cf8;margin-bottom:.5rem}
     /* ── Mobile tool section ── */
     @media(max-width:640px){
       .tool-section{padding:1.5rem .75rem}
@@ -95,11 +99,11 @@
     /* ── Footer ── */
     .site-footer{background:#0a0a14;border-top:1px solid rgba(255,255,255,.07);padding:3rem 1.5rem 1.5rem;margin-top:4rem}
     .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2rem;max-width:1100px;margin:0 auto}
-    .footer-col h3{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#475569;margin:0 0 .8rem}
+    .footer-col h3{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin:0 0 .8rem}
     .footer-col ul{list-style:none;padding:0;margin:0}
     .footer-col li{margin-bottom:.45rem}
-    .footer-col a{color:#475569;text-decoration:none;font-size:.83rem;transition:color .15s}
-    .footer-col a:hover{color:#818cf8}
+    .footer-col a{color:#94a3b8;text-decoration:none;font-size:.83rem;transition:color .15s}
+    .footer-col a:hover{color:#c7d2fe}
     .footer-bottom{max-width:1100px;margin:1.5rem auto 0;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
     .footer-bottom p{color:#334155;font-size:.78rem;margin:0}
   </style>
@@ -107,14 +111,14 @@
 <body>
 
   <!-- ░░ NAV ░░ -->
-  <nav class="nav">
+  <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="nav-inner">
       <a class="brand" href="/">
         <span class="brand-icon">⚡</span>
         <span>EditPDFForm</span>
       </a>
       <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
-      <ul class="nav-links" id="nav-links" role="navigation" aria-label="Main navigation">
+      <ul class="nav-links" id="nav-links">
         <li><a href="/fill-pdf-form-online" style="color:#a5b4fc;font-weight:600">📋 Fill PDF Form</a></li>
         <li><a href="/edit-pdf-online" style="color:#a5b4fc;font-weight:600">✏️ Edit PDF</a></li>
         <li><a href="/sign-pdf-online">✍️ Sign PDF</a></li>
@@ -1562,7 +1566,7 @@
                 <span>Winter / Snow</span>
               </button>
             </div>
-            <p id="cbg-scene-selected" class="upload-hint" style="margin-top:0.5rem;color:#6366f1;font-weight:600"></p>
+            <p id="cbg-scene-selected" class="upload-hint" style="margin-top:0.5rem;color:#818cf8;font-weight:600"></p>
           </div>
 
           <!-- Custom image upload -->
@@ -1740,23 +1744,23 @@
 
   <!-- ░░ SEO CONTENT BLOCK ░░ -->
   <section style="background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);padding:3rem 1.5rem;margin-top:2rem">
-    <div style="max-width:900px;margin:0 auto;color:#64748b;font-size:.9rem;line-height:1.9">
+    <div style="max-width:900px;margin:0 auto;color:#94a3b8;font-size:.9rem;line-height:1.9">
       <h3 style="color:#94a3b8;font-size:1.2rem;margin-bottom:1rem">Free PDF Form Filler &amp; PDF Editor — No Adobe, No Sign-up</h3>
       <p>EditPDFForm is your free online PDF form filler and PDF editor. Whether you need to <strong style="color:#94a3b8">fill a PDF form online</strong>, <strong style="color:#94a3b8">edit PDF text</strong>, <strong style="color:#94a3b8">add a signature to a PDF</strong>, or simply merge and compress PDFs — everything works right in your browser without Adobe Acrobat and without creating an account.</p>
       <p>Common uses: filling government application forms, job application PDFs, passport forms, bank KYC forms, SSC/UPSC exam forms, rental agreements, insurance documents and more. Our <strong style="color:#94a3b8">PDF form filler</strong> works with both interactive PDF forms and flat/scanned PDFs — just click anywhere and type.</p>
       <p>Beyond PDF editing, EditPDFForm also offers free image tools: compress JPG to 50KB, resize images to exact dimensions, convert between JPG/PNG/WEBP/HEIC formats, make passport-size photos, and remove image backgrounds using AI.</p>
       <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:.5rem">
-        <a href="/fill-pdf-form-online" style="color:#6366f1;text-decoration:none;font-size:.82rem">Fill PDF Form Online →</a>
+        <a href="/fill-pdf-form-online" style="color:#818cf8;text-decoration:none;font-size:.82rem">Fill PDF Form Online →</a>
         <span style="color:#334155">·</span>
-        <a href="/edit-pdf-online" style="color:#6366f1;text-decoration:none;font-size:.82rem">Edit PDF Online →</a>
+        <a href="/edit-pdf-online" style="color:#818cf8;text-decoration:none;font-size:.82rem">Edit PDF Online →</a>
         <span style="color:#334155">·</span>
-        <a href="/sign-pdf-online" style="color:#6366f1;text-decoration:none;font-size:.82rem">Sign PDF Online →</a>
+        <a href="/sign-pdf-online" style="color:#818cf8;text-decoration:none;font-size:.82rem">Sign PDF Online →</a>
         <span style="color:#334155">·</span>
-        <a href="/merge-pdf" style="color:#6366f1;text-decoration:none;font-size:.82rem">Merge PDF →</a>
+        <a href="/merge-pdf" style="color:#818cf8;text-decoration:none;font-size:.82rem">Merge PDF →</a>
         <span style="color:#334155">·</span>
-        <a href="/compress-jpg-to-50kb" style="color:#6366f1;text-decoration:none;font-size:.82rem">Compress Image →</a>
+        <a href="/compress-jpg-to-50kb" style="color:#818cf8;text-decoration:none;font-size:.82rem">Compress Image →</a>
         <span style="color:#334155">·</span>
-        <a href="/passport-photo-maker" style="color:#6366f1;text-decoration:none;font-size:.82rem">Passport Photo →</a>
+        <a href="/passport-photo-maker" style="color:#818cf8;text-decoration:none;font-size:.82rem">Passport Photo →</a>
       </div>
     </div>
   </section>
@@ -1765,12 +1769,12 @@
     <div class="footer-grid">
       <div class="footer-col">
         <div style="font-size:1.1rem;font-weight:800;color:#f1f5f9;margin-bottom:.6rem">⚡ EditPDFForm</div>
-        <p style="font-size:.82rem;color:#475569;line-height:1.7;margin:0">Free online image &amp; PDF tools.<br>No sign-up. Files deleted after download.<br>100% free forever.</p>
+        <p style="font-size:.82rem;color:#94a3b8;line-height:1.7;margin:0">Free online image &amp; PDF tools.<br>No sign-up. Files deleted after download.<br>100% free forever.</p>
         <div style="margin-top:.9rem;display:flex;gap:.5rem;flex-wrap:wrap">
-          <a href="/about"          style="font-size:.78rem;color:#6366f1;text-decoration:none">About</a>
-          <a href="/contact"        style="font-size:.78rem;color:#6366f1;text-decoration:none">Contact</a>
-          <a href="/privacy-policy" style="font-size:.78rem;color:#6366f1;text-decoration:none">Privacy</a>
-          <a href="/terms-of-service" style="font-size:.78rem;color:#6366f1;text-decoration:none">Terms</a>
+          <a href="/about"          style="font-size:.78rem;color:#818cf8;text-decoration:none">About</a>
+          <a href="/contact"        style="font-size:.78rem;color:#818cf8;text-decoration:none">Contact</a>
+          <a href="/privacy-policy" style="font-size:.78rem;color:#818cf8;text-decoration:none">Privacy</a>
+          <a href="/terms-of-service" style="font-size:.78rem;color:#818cf8;text-decoration:none">Terms</a>
         </div>
       </div>
       <div class="footer-col">
@@ -1811,7 +1815,7 @@
     </div>
     <div class="footer-bottom">
       <p>© 2026 EditPDFForm — Free PDF Form Filler &amp; PDF Editor online. Fill, edit, sign PDFs free. No tracking. No watermarks.</p>
-      <p>Built with ❤️ using Python · <a href="/sitemap.xml" style="color:#475569">Sitemap</a></p>
+      <p>Built with ❤️ using Python · <a href="/sitemap.xml" style="color:#818cf8">Sitemap</a></p>
     </div>
   </footer>
 
