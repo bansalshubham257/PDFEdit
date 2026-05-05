@@ -66,6 +66,13 @@ app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB upload limit
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'imgtools-secret')
 app.config['SITE_URL']   = os.environ.get('SITE_URL', 'https://pixeldocs.io')
 
+import time as _time
+_STATIC_VER = os.environ.get('STATIC_VERSION', str(int(_time.time())))
+
+@app.context_processor
+def inject_static_ver():
+    return {'static_ver': _STATIC_VER}
+
 TMP_DIR = tempfile.gettempdir()
 
 log_handlers = [logging.StreamHandler(sys.stdout)]
