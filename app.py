@@ -96,7 +96,7 @@ _STATIC_VER = os.environ.get('STATIC_VERSION', str(int(_time.time())))
 
 @app.context_processor
 def inject_static_ver():
-    return {'static_ver': _STATIC_VER}
+    return {'static_ver': _STATIC_VER, 'inline_css': _INLINE_CSS}
 
 TMP_DIR = tempfile.gettempdir()
 
@@ -234,6 +234,24 @@ try:
 except Exception as _e:
     _MINIFIED_JS = None
     logging.warning(f'rjsmin unavailable, serving raw script.js: {_e}')
+
+# ── Inline CSS — minified at startup, injected directly into HTML ──────────
+# Always inlines the CSS — eliminating the blocking style.css network request.
+# Uses rcssmin for minification if available, otherwise inlines raw CSS.
+_css_path = os.path.join(app.static_folder, 'style.css')
+try:
+    import rcssmin as _rcssmin
+    with open(_css_path, 'r', encoding='utf-8') as _f:
+        _INLINE_CSS = _rcssmin.cssmin(_f.read())
+    logging.info(f'style.css minified for inline: {len(open(_css_path).read())} → {len(_INLINE_CSS)} bytes')
+except ImportError:
+    # rcssmin not installed — inline raw CSS (still eliminates the blocking request)
+    with open(_css_path, 'r', encoding='utf-8') as _f:
+        _INLINE_CSS = _f.read()
+    logging.warning('rcssmin not available — inlining raw style.css (no minification)')
+except Exception as _e:
+    _INLINE_CSS = None
+    logging.warning(f'Could not read style.css for inlining: {_e}')
 
 @app.route('/static/script.js')
 def serve_script_js():
