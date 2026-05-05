@@ -1400,7 +1400,6 @@ def api_pdf_editor_preview():
         doc  = fitz.open(stream=data, filetype='pdf')
 
         if doc.is_encrypted:
-            # Try to authenticate — empty string first, then user-supplied
             ok = doc.authenticate(password)
             if not ok:
                 return jsonify({'error': 'password_required', 'needs_password': True}), 401
@@ -1410,11 +1409,78 @@ def api_pdf_editor_preview():
             mat = fitz.Matrix(1.5, 1.5)
             pix = page.get_pixmap(matrix=mat, alpha=False)
             b64 = base64.b64encode(pix.tobytes('png')).decode()
+
+            # Extract text spans for the Edit-Text tool
+            text_blocks = []
+            try:
+                d = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
+                pw, ph = page.rect.width, page.rect.height
+                for block in d.get("blocks", []):
+                    if block.get("type") != 0:   # 0 = text block
+                        continue
+                    for line in block.get("lines", []):
+                        for span in line.get("spans", []):
+                            raw = span.get("text", "")
+                            if not raw.strip():
+                                continue
+                            x0, y0, x1, y1 = span["bbox"]
+                            # colour: packed int RGB → hex
+                            c = span.get("color", 0)
+                            r_c = ((c >> 16) & 0xFF) / 255
+                            g_c = ((c >> 8)  & 0xFF) / 255
+                            b_c = (c & 0xFF) / 255
+                            hex_color = '#{:02x}{:02x}{:02x}'.format(
+                                int(r_c*255), int(g_c*255), int(b_c*255))
+
+                            # Parse font name — strip PDF subset prefix (e.g. "ABCDEF+")
+                            raw_font = span.get("font", "") or ""
+                            clean_font = raw_font.split("+", 1)[-1] if "+" in raw_font else raw_font
+                            fl_lower = clean_font.lower()
+
+                            # Detect bold / italic from font name or span flags
+                            span_flags = span.get("flags", 0)
+                            is_bold   = bool(span_flags & 2**4) or any(x in fl_lower for x in ("bold", "-bd", "heavy", "black", "demi"))
+                            is_italic = bool(span_flags & 2**1) or any(x in fl_lower for x in ("italic", "oblique", "-it", "-ob"))
+
+                            # Map to CSS font-family (best effort)
+                            if any(x in fl_lower for x in ("times", "roman", "serif", "garamond", "georgia")):
+                                css_family = "Georgia, 'Times New Roman', serif"
+                            elif any(x in fl_lower for x in ("courier", "mono", "typewriter", "consol")):
+                                css_family = "'Courier New', Courier, monospace"
+                            elif any(x in fl_lower for x in ("arial", "helvetica", "sans")):
+                                css_family = "Arial, Helvetica, sans-serif"
+                            elif any(x in fl_lower for x in ("verdana",)):
+                                css_family = "Verdana, sans-serif"
+                            elif any(x in fl_lower for x in ("calibri",)):
+                                css_family = "Calibri, Arial, sans-serif"
+                            else:
+                                css_family = "Arial, sans-serif"
+
+                            text_blocks.append({
+                                'text':       raw,
+                                'font_size':  round(span.get("size", 12), 2),
+                                'font':       clean_font,
+                                'font_raw':   raw_font,
+                                'color':      hex_color,
+                                'bold':       is_bold,
+                                'italic':     is_italic,
+                                'css_family': css_family,
+                                # normalised coordinates (0-1)
+                                'x0': round(x0/pw, 6), 'y0': round(y0/ph, 6),
+                                'x1': round(x1/pw, 6), 'y1': round(y1/ph, 6),
+                                # raw PDF-pt coords for save
+                                'rx0': round(x0,3), 'ry0': round(y0,3),
+                                'rx1': round(x1,3), 'ry1': round(y1,3),
+                            })
+            except Exception:
+                pass   # non-fatal — edit-text just won't show existing spans
+
             pages.append({
-                'index':    i,
+                'index':     i,
                 'width_pt':  page.rect.width,
                 'height_pt': page.rect.height,
                 'img':       b64,
+                'text_blocks': text_blocks,
             })
         return jsonify({'page_count': len(pages), 'pages': pages})
     except Exception as e:
@@ -1435,9 +1501,25 @@ def api_pdf_editor_save():
         annotations = _json.loads(request.form.get('annotations', '[]'))
     except Exception:
         return jsonify({'error': 'Invalid annotations JSON'}), 400
+
+    def hex_to_rgb(hex_str):
+        h = hex_str.lstrip('#')
+        if len(h) < 6:
+            return (0, 0, 0)
+        return (int(h[0:2],16)/255, int(h[2:4],16)/255, int(h[4:6],16)/255)
+
+    def rgba_css_to_fitz(rgba_str):
+        """Parse rgba(r,g,b,a) css string → ((r,g,b), alpha)"""
+        import re
+        m = re.match(r'rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)', rgba_str.strip())
+        if not m:
+            return (1,1,0), 0.45
+        r, g, b = int(m.group(1))/255, int(m.group(2))/255, int(m.group(3))/255
+        a = float(m.group(4)) if m.group(4) else 0.45
+        return (r, g, b), a
+
     try:
         doc = fitz.open(stream=f.read(), filetype='pdf')
-
         if doc.is_encrypted:
             ok = doc.authenticate(password)
             if not ok:
@@ -1449,49 +1531,163 @@ def api_pdf_editor_save():
                 continue
             page = doc[page_idx]
             pw, ph = page.rect.width, page.rect.height
-            x = float(ann.get('x_pct', 0)) * pw
-            y = float(ann.get('y_pct', 0)) * ph
+            ann_type = ann.get('type', '')
 
-            if ann.get('type') == 'text':
-                text = ann.get('text', '').strip()
-                if not text:
-                    continue
+            # ── Point-based annotations ──
+            if ann_type in ('text', 'note', 'signature', 'checkbox', 'image'):
+                x = float(ann.get('x_pct', 0)) * pw
+                y = float(ann.get('y_pct', 0)) * ph
+
+                if ann_type == 'text':
+                    text = ann.get('text', '').strip()
+                    if not text:
+                        continue
+                    font_size = float(ann.get('font_size', 12))
+                    color     = hex_to_rgb(ann.get('color', '#000000'))
+                    # Font family → fitz built-in name mapping (best-effort)
+                    font_family = ann.get('font_family', 'Arial')
+                    fitz_font = 'helv'
+                    fl = font_family.lower()
+                    if 'times' in fl or 'serif' in fl:
+                        fitz_font = 'tiro'
+                    elif 'courier' in fl or 'mono' in fl:
+                        fitz_font = 'cour'
+                    bold      = ann.get('bold', False)
+                    italic    = ann.get('italic', False)
+                    if bold and italic:   fitz_font += 'bi' if fitz_font in ('helv','cour','tiro') else ''
+                    elif bold:            fitz_font += 'b'  if fitz_font in ('helv','cour','tiro') else ''
+                    elif italic:          fitz_font += 'i'  if fitz_font in ('helv','cour','tiro') else ''
+                    try:
+                        page.insert_text(fitz.Point(x, y), text, fontname=fitz_font, fontsize=font_size, color=color)
+                    except Exception:
+                        page.insert_text(fitz.Point(x, y), text, fontsize=font_size, color=color)
+
+                elif ann_type == 'note':
+                    text = ann.get('text', '').strip()
+                    if text:
+                        # Draw yellow box then text inside
+                        box_w, box_h = 160, 80
+                        rect = fitz.Rect(x, y, x + box_w, y + box_h)
+                        page.draw_rect(rect, color=(0.97, 0.82, 0.21), fill=(1, 0.99, 0.77), width=1)
+                        page.insert_textbox(fitz.Rect(x+4, y+4, x+box_w-4, y+box_h-4),
+                                            text, fontsize=9, color=(0.1,0.1,0.1))
+
+                elif ann_type == 'signature':
+                    img_data = ann.get('img_data', '')
+                    if ',' in img_data:
+                        img_data = img_data.split(',', 1)[1]
+                    img_bytes = base64.b64decode(img_data)
+                    sig_w = float(ann.get('width_pct', 0.25)) * pw
+                    sig_h = float(ann.get('height_pct', 0.08)) * ph
+                    page.insert_image(fitz.Rect(x, y, x + sig_w, y + sig_h), stream=img_bytes)
+
+                elif ann_type == 'image':
+                    img_data = ann.get('img_data', '')
+                    if ',' in img_data:
+                        img_data = img_data.split(',', 1)[1]
+                    img_bytes = base64.b64decode(img_data)
+                    img_w = float(ann.get('width_pct', 0.3)) * pw
+                    # Approximate height as proportional (will render correctly)
+                    img_h = img_w * 0.75
+                    page.insert_image(fitz.Rect(x - img_w/2, y - img_h/2, x + img_w/2, y + img_h/2), stream=img_bytes)
+
+                elif ann_type == 'checkbox':
+                    if ann.get('checked', False):
+                        size = float(ann.get('size', 22)) * (pw / 900)
+                        size = max(8, min(40, size))
+                        p1 = fitz.Point(x,               y + size * 0.50)
+                        p2 = fitz.Point(x + size * 0.38, y + size * 0.90)
+                        p3 = fitz.Point(x + size,        y + size * 0.10)
+                        lw = max(1.0, size * 0.13)
+                        page.draw_line(p1, p2, color=(0, 0.35, 0.75), width=lw)
+                        page.draw_line(p2, p3, color=(0, 0.35, 0.75), width=lw)
+
+            # ── Edit existing text (redact original + insert new) ──
+            elif ann_type == 'edittext':
+                rx0 = float(ann.get('rx0', 0)); ry0 = float(ann.get('ry0', 0))
+                rx1 = float(ann.get('rx1', 0)); ry1 = float(ann.get('ry1', 0))
+                new_text  = ann.get('text', '').strip()
                 font_size = float(ann.get('font_size', 12))
-                hex_col   = ann.get('color', '#000000').lstrip('#')
-                r = int(hex_col[0:2], 16) / 255
-                g = int(hex_col[2:4], 16) / 255
-                b = int(hex_col[4:6], 16) / 255
-                page.insert_text(fitz.Point(x, y), text,
-                                 fontsize=font_size, color=(r, g, b))
+                color     = hex_to_rgb(ann.get('color', '#000000'))
+                is_bold   = ann.get('bold',   False)
+                is_italic = ann.get('italic', False)
+                orig_font = ann.get('font', '') or ''   # clean font name sent from client
 
-            elif ann.get('type') == 'signature':
-                img_data = ann.get('img_data', '')
-                if ',' in img_data:
-                    img_data = img_data.split(',', 1)[1]
-                img_bytes = base64.b64decode(img_data)
-                sig_w = float(ann.get('width_pct',  0.25)) * pw
-                sig_h = float(ann.get('height_pct', 0.08)) * ph
-                page.insert_image(fitz.Rect(x, y, x + sig_w, y + sig_h),
-                                  stream=img_bytes)
+                # Map to best-matching built-in PyMuPDF/PDF font preserving bold+italic
+                def pick_fitz_font(font_name, bold, italic):
+                    fl = font_name.lower()
+                    if any(x in fl for x in ('times', 'roman', 'serif', 'georgia', 'garamond')):
+                        base = 'tibo' if bold else 'tiit' if italic else 'tiro'
+                        if bold and italic: base = 'tibi'
+                    elif any(x in fl for x in ('courier', 'mono', 'typewriter', 'consol')):
+                        base = 'cobo' if bold else 'coit' if italic else 'cour'
+                        if bold and italic: base = 'cobi'
+                    else:  # Arial / Helvetica / any sans
+                        base = 'hebo' if bold else 'heit' if italic else 'helv'
+                        if bold and italic: base = 'hebi'
+                    return base
 
-            elif ann.get('type') == 'checkbox':
-                if ann.get('checked', False):
-                    size = float(ann.get('size', 22)) * (pw / 900)
-                    size = max(8, min(40, size))
-                    p1 = fitz.Point(x,               y + size * 0.50)
-                    p2 = fitz.Point(x + size * 0.38, y + size * 0.90)
-                    p3 = fitz.Point(x + size,        y + size * 0.10)
-                    lw = max(1.0, size * 0.13)
-                    page.draw_line(p1, p2, color=(0, 0.35, 0.75), width=lw)
-                    page.draw_line(p2, p3, color=(0, 0.35, 0.75), width=lw)
+                fitz_font = pick_fitz_font(orig_font, is_bold, is_italic)
+
+                # 1. Redact (cleanly erase) the original text area
+                erase_rect = fitz.Rect(rx0 - 1, ry0 - 2, rx1 + 1, ry1 + 2)
+                page.add_redact_annot(erase_rect, fill=(1, 1, 1))
+                page.apply_redactions()
+
+                # 2. Write replacement text with original style (skip if deleted)
+                if new_text:
+                    try:
+                        page.insert_text(
+                            fitz.Point(rx0, ry1 - 1),
+                            new_text,
+                            fontname=fitz_font,
+                            fontsize=font_size,
+                            color=color,
+                        )
+                    except Exception:
+                        # Last-resort fallback (no font specified)
+                        page.insert_text(
+                            fitz.Point(rx0, ry1 - 1),
+                            new_text,
+                            fontsize=font_size,
+                            color=color,
+                        )
+
+            # ── Rectangle-based annotations ──
+            elif ann_type in ('highlight', 'rect', 'ellipse', 'whiteout'):
+                x1 = float(ann.get('x1_pct', 0)) * pw
+                y1 = float(ann.get('y1_pct', 0)) * ph
+                x2 = float(ann.get('x2_pct', 0)) * pw
+                y2 = float(ann.get('y2_pct', 0)) * ph
+                rect = fitz.Rect(x1, y1, x2, y2)
+
+                if ann_type == 'highlight':
+                    hl_css = ann.get('hl_color', 'rgba(253,230,138,0.55)')
+                    (r, g, b), alpha = rgba_css_to_fitz(hl_css)
+                    hl = page.add_highlight_annot(rect)
+                    hl.set_colors(stroke=(r, g, b))
+                    hl.set_opacity(alpha)
+                    hl.update()
+
+                elif ann_type == 'rect':
+                    color  = hex_to_rgb(ann.get('color', '#3b82f6'))
+                    sw     = float(ann.get('stroke_width', 2))
+                    page.draw_rect(rect, color=color, fill=color, fill_opacity=0.1, width=sw)
+
+                elif ann_type == 'ellipse':
+                    color = hex_to_rgb(ann.get('color', '#3b82f6'))
+                    sw    = float(ann.get('stroke_width', 2))
+                    page.draw_oval(rect, color=color, fill=color, fill_opacity=0.1, width=sw)
+
+                elif ann_type == 'whiteout':
+                    page.draw_rect(rect, color=(1, 1, 1), fill=(1, 1, 1), width=0)
 
         buf = io.BytesIO()
-        # Save without encryption so the filled PDF is freely usable
         doc.save(buf, encryption=fitz.PDF_ENCRYPT_NONE)
         buf.seek(0)
         stem = os.path.splitext(f.filename)[0] if f.filename else 'document'
         return send_file(buf, mimetype='application/pdf', as_attachment=True,
-                         download_name=f'{stem}_filled.pdf')
+                         download_name=f'{stem}_edited.pdf')
     except Exception as e:
         logger.exception('pdf-editor/save error')
         return jsonify({'error': str(e)}), 500
