@@ -1945,7 +1945,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════
-   PDF EDITOR
+   PDF EDITOR  (v2 — full workspace)
 ═══════════════════════════════════════════════════════════════ */
 (function () {
   try {
@@ -1954,42 +1954,307 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   let annotations = [];
   let activeTool  = 'text';
   let pendingClick = null;
-  const _pageDims = new WeakMap(); // cache {pw, ph} per page wrapper — avoids offsetWidth/Height reflow
+  let hlColor      = 'rgba(253,230,138,0.55)'; // default highlight colour
+  const _pageDims  = new WeakMap();
 
-  // ── tool selection ──
-  document.querySelectorAll('.pdfed-tool').forEach(btn => {
+  // ── Tool selection ──
+  document.querySelectorAll('.pdfed-tool-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.pdfed-tool').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.pdfed-tool-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeTool = btn.dataset.tool;
+      updateToolUI();
+
+      // "Add Image" immediately opens file picker
+      if (activeTool === 'image') {
+        document.getElementById('pdfed-img-input').click();
+      }
     });
   });
 
-  // ── file upload ──
+  function updateToolUI() {
+    // Text options panel visibility
+    const textOpts = document.getElementById('pdfed-text-options');
+    if (textOpts) textOpts.style.display = (activeTool === 'text' || activeTool === 'note' || activeTool === 'edittext') ? '' : 'none';
+    // Highlight colour pickers
+    const hlDiv = document.getElementById('pdfed-hl-colors');
+    if (hlDiv) hlDiv.style.display = (activeTool === 'highlight') ? '' : 'none';
+    // Color label
+    const cl = document.getElementById('pdfed-color-label');
+    if (cl) {
+      if (activeTool === 'highlight' || activeTool === 'whiteout') cl.textContent = 'Shape Color';
+      else if (activeTool === 'rect' || activeTool === 'ellipse') cl.textContent = 'Stroke Color';
+      else cl.textContent = 'Text Color';
+    }
+    // Stroke width row
+    const sw = document.getElementById('pdfed-stroke-row');
+    if (sw) sw.style.display = (activeTool === 'rect' || activeTool === 'ellipse') ? '' : 'none';
+    // Update canvas cursor
+    document.querySelectorAll('#pdfed-pages [data-page]').forEach(pw => {
+      pw.style.cursor = ['highlight','whiteout','rect','ellipse'].includes(activeTool) ? 'crosshair' : 'default';
+    });
+    // Show/hide edit-text overlays on all pages
+    toggleEditTextOverlays(activeTool === 'edittext');
+  }
+
+  // ════════════════════════════════════════
+  // EDIT TEXT — show existing PDF text as editable overlays
+  // ════════════════════════════════════════
+  // textBlocksByPage[pageIndex] = array of span objects from the server
+  let textBlocksByPage = {};
+
+  function storeTextBlocks(pages) {
+    textBlocksByPage = {};
+    pages.forEach(pg => {
+      textBlocksByPage[pg.index] = pg.text_blocks || [];
+    });
+  }
+
+  function toggleEditTextOverlays(show) {
+    document.querySelectorAll('.pdfed-etxt-overlay').forEach(el => el.remove());
+    // hint bar
+    let hint = document.getElementById('pdfed-etxt-hint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'pdfed-etxt-hint';
+      hint.className = 'pdfed-etxt-hint';
+      hint.innerHTML = '🖊 <strong>Edit Text mode</strong> — hover over any text on the page and click it to edit or delete it. Press <kbd style="background:rgba(255,255,255,.15);padding:1px 5px;border-radius:3px">Enter</kbd> to save, <kbd style="background:rgba(255,255,255,.15);padding:1px 5px;border-radius:3px">Esc</kbd> to cancel.';
+      const canvas = document.getElementById('pdfed-canvas-panel');
+      if (canvas) canvas.insertBefore(hint, canvas.firstChild);
+    }
+    hint.style.display = show ? '' : 'none';
+    if (!show) return;
+    document.querySelectorAll('#pdfed-pages [data-page]').forEach(wrapper => {
+      const pageIndex = parseInt(wrapper.dataset.page);
+      const img = wrapper.querySelector('img');
+      if (!img) return;
+      // wait until image has dimensions
+      if (!img.complete || !img.offsetWidth) {
+        img.addEventListener('load', () => {
+          const blocks = textBlocksByPage[pageIndex] || [];
+          blocks.forEach((span, si) => buildEditTextOverlay(span, si, pageIndex, wrapper, img));
+        }, { once: true });
+        return;
+      }
+      const blocks = textBlocksByPage[pageIndex] || [];
+      blocks.forEach((span, si) => buildEditTextOverlay(span, si, pageIndex, wrapper, img));
+    });
+  }
+
+    function buildEditTextOverlay(span, spanIndex, pageIndex, wrapper, img) {
+    // Use the displayed image width (not natural/PNG width) for accurate positioning
+    const imgW = img.getBoundingClientRect().width  || img.offsetWidth  || 860;
+    const imgH = img.getBoundingClientRect().height || img.offsetHeight || 1100;
+
+    const x = span.x0 * imgW;
+    const y = span.y0 * imgH;
+    const w = Math.max(30, (span.x1 - span.x0) * imgW);
+    const h = Math.max(10, (span.y1 - span.y0) * imgH);
+
+    // Scale font from PDF pts → display px using actual render ratio
+    const pdfW  = wrapper._pdfW || span.rx0 / (span.x0 || 0.001); // fallback
+    const scaleX = imgW / (pdfW || 595);
+    const fsPx   = Math.max(6, span.font_size * scaleX);
+
+    const fontFamily = span.css_family || 'Arial, sans-serif';
+    const fontWeight = span.bold   ? 'bold'   : 'normal';
+    const fontStyle  = span.italic ? 'italic' : 'normal';
+    const textColor  = span.color  || '#000000';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'pdfed-etxt-overlay';
+    overlay.dataset.spanIndex = spanIndex;
+    overlay.dataset.page      = pageIndex;
+
+    // Base position style — no border, no background by default
+    overlay.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;z-index:8;box-sizing:border-box;overflow:hidden;border-radius:2px;`;
+
+    overlay.addEventListener('mouseenter', () => {
+      if (overlay._editing || span._edited) return;
+      if (activeTool !== 'edittext') return;
+      overlay.style.outline    = '1.5px dashed rgba(99,102,241,0.55)';
+      overlay.style.background = 'rgba(99,102,241,0.06)';
+      overlay.style.cursor     = 'text';
+    });
+    overlay.addEventListener('mouseleave', () => {
+      if (overlay._editing || span._edited) return;
+      overlay.style.outline    = '';
+      overlay.style.background = '';
+    });
+    overlay.addEventListener('click', e => {
+      e.stopPropagation();
+      if (activeTool !== 'edittext') return;
+      if (overlay._editing) return;
+      activateEditOverlay(overlay, span, spanIndex, pageIndex, fsPx, fontFamily, fontWeight, fontStyle, textColor);
+    });
+
+    // Restore saved state immediately if this span was already edited
+    if (span._edited) {
+      _applyEditedState(overlay, span, fsPx, fontFamily, fontWeight, fontStyle, textColor);
+    }
+
+    wrapper.appendChild(overlay);
+    }
+
+    // Final visual state — no borders, no UI chrome, pure WYSIWYG
+    function _applyEditedState(overlay, span, fsPx, fontFamily, fontWeight, fontStyle, textColor) {
+    const x = overlay.style.left;
+    const y = overlay.style.top;
+    const w = overlay.style.width;
+    const h = overlay.style.height;
+
+    overlay._editing  = false;
+    overlay.innerHTML = '';
+
+    if (span._editedText === '') {
+      // DELETED — white rectangle, completely invisible on white PDF background
+      overlay.style.cssText = `position:absolute;left:${x};top:${y};width:${w};height:${h};z-index:9;box-sizing:border-box;overflow:hidden;background:#ffffff;border:none;outline:none;cursor:default;border-radius:0;`;
+    } else {
+      // REPLACED — white cover + new text in exact original style, no border
+      overlay.style.cssText = `position:absolute;left:${x};top:${y};width:${w};height:${h};z-index:9;box-sizing:border-box;overflow:hidden;background:#ffffff;border:none;outline:none;cursor:text;border-radius:0;`;
+      const lbl = document.createElement('span');
+      lbl.textContent = span._editedText;
+      lbl.style.cssText = `display:block;white-space:nowrap;line-height:1;pointer-events:none;padding:0 1px;font-size:${fsPx}px;font-family:${fontFamily};font-weight:${fontWeight};font-style:${fontStyle};color:${textColor};`;
+      overlay.appendChild(lbl);
+    }
+    }
+
+    function activateEditOverlay(overlay, span, spanIndex, pageIndex, fsPx, fontFamily, fontWeight, fontStyle, textColor) {
+    const x = overlay.style.left;
+    const y = overlay.style.top;
+    const w = overlay.style.width;
+
+    overlay._editing  = true;
+    overlay.innerHTML = '';
+
+    // While editing: white bg + thin blue border, overflow visible for buttons
+    overlay.style.cssText = `position:absolute;left:${x};top:${y};width:${w};min-width:80px;z-index:20;box-sizing:border-box;overflow:visible;background:#ffffff;border:1.5px solid #6366f1;outline:none;border-radius:3px;padding:1px 2px;`;
+
+    const input = document.createElement('input');
+    input.type  = 'text';
+    input.value = (span._editedText !== undefined && span._editedText !== null) ? span._editedText : span.text;
+    input.style.cssText = `display:block;width:100%;min-width:50px;background:#fff;border:none;border-bottom:1px solid #6366f1;outline:none;font-size:${fsPx}px;font-family:${fontFamily};font-weight:${fontWeight};font-style:${fontStyle};color:${textColor};padding:0;margin:0;box-sizing:border-box;line-height:1.2;`;
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:3px;margin-top:3px;z-index:21;position:relative;';
+
+    function mkBtn(label, bg, fg) {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.style.cssText = `font-size:10px;padding:2px 7px;background:${bg};color:${fg};border:none;border-radius:4px;cursor:pointer;white-space:nowrap;font-family:inherit;`;
+      return b;
+    }
+
+    const saveBtn   = mkBtn('✔ Save',   '#6366f1', '#fff');
+    const delBtn    = mkBtn('🗑 Delete', '#ef4444', '#fff');
+    const cancelBtn = mkBtn('✕',        '#475569', '#fff');
+
+    btnRow.append(saveBtn, delBtn, cancelBtn);
+    overlay.append(input, btnRow);
+    input.focus();
+    input.select();
+
+    function commit(newText) {
+      // Upsert annotation
+      annotations = annotations.filter(
+        a => !(a.type === 'edittext' && a.page === pageIndex && a._spanIndex === spanIndex)
+      );
+      annotations.push({
+        type: 'edittext', page: pageIndex, _spanIndex: spanIndex,
+        orig_text: span.text, text: newText,
+        font_size: span.font_size, font: span.font || '',
+        bold: span.bold || false, italic: span.italic || false,
+        color: span.color || '#000000',
+        rx0: span.rx0, ry0: span.ry0, rx1: span.rx1, ry1: span.ry1,
+      });
+      span._edited     = true;
+      span._editedText = newText;   // '' means deleted
+      _applyEditedState(overlay, span, fsPx, fontFamily, fontWeight, fontStyle, textColor);
+      updateAnnCount();
+    }
+
+    function cancel() {
+      overlay._editing = false;
+      overlay.innerHTML = '';
+      if (span._edited) {
+        _applyEditedState(overlay, span, fsPx, fontFamily, fontWeight, fontStyle, textColor);
+      } else {
+        // Revert to transparent idle state
+        const ox = overlay.style.left, oy = overlay.style.top, ow = overlay.style.width, oh = overlay.style.height;
+        overlay.style.cssText = `position:absolute;left:${ox};top:${oy};width:${ow};height:${oh};z-index:8;box-sizing:border-box;overflow:hidden;border-radius:2px;`;
+      }
+    }
+
+    saveBtn  .addEventListener('click', e => { e.stopPropagation(); commit(input.value); });
+    delBtn   .addEventListener('click', e => { e.stopPropagation(); commit(''); });
+    cancelBtn.addEventListener('click', e => { e.stopPropagation(); cancel(); });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  { e.preventDefault(); commit(input.value); }
+      if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    });
+    }
+
+  // ── Font style toggles ──
+  ['pdfed-bold','pdfed-italic','pdfed-underline'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', () => btn.classList.toggle('active'));
+  });
+
+  // ── Colour swatches ──
+  document.querySelectorAll('.pdfed-color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      document.querySelectorAll('.pdfed-color-swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      document.getElementById('pdfed-color').value = sw.dataset.color;
+    });
+  });
+  document.querySelectorAll('.pdfed-hl-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      document.querySelectorAll('.pdfed-hl-swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      hlColor = sw.dataset.hlcolor;
+    });
+  });
+
+  // ── Opacity display ──
+  const opacitySlider = document.getElementById('pdfed-opacity');
+  const opacityVal    = document.getElementById('pdfed-opacity-val');
+  if (opacitySlider && opacityVal) {
+    opacitySlider.addEventListener('input', () => { opacityVal.textContent = opacitySlider.value + '%'; });
+  }
+
+  // ── Image file input ──
+  const imgInput = document.getElementById('pdfed-img-input');
+  if (imgInput) {
+    imgInput.addEventListener('change', () => {
+      if (imgInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          // Store pending image data — user clicks on page to place it
+          window._pdfedPendingImg = e.target.result;
+          showPdfEdStatus('info', '🖼 Click on any page to place the image');
+        };
+        reader.readAsDataURL(imgInput.files[0]);
+        imgInput.value = '';
+      }
+    });
+  }
+
+  // ── File upload ──
   function setupPdfDrop(dropId, inputId) {
     const zone  = document.getElementById(dropId);
     const input = document.getElementById(inputId);
     if (!zone || !input) return;
-    zone.addEventListener('click', e => {
-      if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return;
-      input.click();
-    });
+    zone.addEventListener('click', e => { if (e.target.tagName === 'LABEL' || e.target.tagName === 'INPUT') return; input.click(); });
     zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-      e.preventDefault(); zone.classList.remove('drag-over');
-      if (e.dataTransfer.files[0]) handlePdfEditorFile(e.dataTransfer.files[0]);
-    });
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handlePdfEditorFile(e.dataTransfer.files[0]); });
     input.addEventListener('change', () => { if (input.files[0]) handlePdfEditorFile(input.files[0]); });
   }
   setupPdfDrop('pdfed-drop', 'pdfed-file');
-  console.log('[PDF Editor] initialized, drop zone ready');
 
   async function handlePdfEditorFile(file) {
-    console.log('[PDF Editor] file selected:', file?.name);
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-      showPdfEdStatus('error', '❌ Please upload a PDF file'); return;
-    }
+    if (!file.name.toLowerCase().endsWith('.pdf')) { showPdfEdStatus('error', '❌ Please upload a PDF file'); return; }
     pdfedFile   = file;
     annotations = [];
     document.getElementById('pdfed-password-row').style.display = 'none';
@@ -2000,7 +2265,6 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   }
 
   async function loadPdfPreview(password) {
-    console.log('[PDF Editor] calling /api/pdf-editor/preview');
     showPdfEdStatus('info', '⏳ Loading PDF pages…');
     const fd = new FormData();
     fd.append('file', pdfedFile);
@@ -2008,93 +2272,220 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     try {
       const res  = await fetch('/api/pdf-editor/preview', { method: 'POST', body: fd });
       const data = await res.json();
-      console.log('[PDF Editor] preview response:', res.status, data.page_count ?? data.error ?? data);
-
-      if (data.needs_password) {
-        // Show password input
-        document.getElementById('pdfed-password-row').style.display = 'flex';
-        showPdfEdStatus('error', '🔒 PDF is password-protected — enter the password above');
-        return;
-      }
+      if (data.needs_password) { document.getElementById('pdfed-password-row').style.display = 'flex'; showPdfEdStatus('error', '🔒 Enter PDF password above'); return; }
       if (data.error) { showPdfEdStatus('error', '❌ ' + data.error); return; }
-
       document.getElementById('pdfed-password-row').style.display = 'none';
       pdfedPages = data.pages;
+      storeTextBlocks(data.pages);   // cache spans for Edit-Text tool
+      // Set filename
+      const fnEl = document.getElementById('pdfed-filename');
+      if (fnEl) fnEl.textContent = pdfedFile.name;
       renderPages();
-      // Hide upload card, show workspace, scroll into view
+      renderThumbnails();
       document.getElementById('pdfed-upload-card').style.display = 'none';
       const ws = document.getElementById('pdfed-workspace');
       ws.classList.remove('hidden');
-      ws.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      showPdfEdStatus('success', `✅ Loaded ${data.page_count} page(s) — click anywhere to annotate`);
+      document.body.classList.add('pdfed-open'); // prevent page scroll
+      showPdfEdStatus('success', `✅ Loaded ${data.page_count} page(s) — click on any page to annotate`);
+      updateToolUI();
     } catch (e) { showPdfEdStatus('error', '❌ ' + e.message); }
   }
 
-  // Unlock button
   document.getElementById('pdfed-unlock-btn').addEventListener('click', async () => {
     const pw = document.getElementById('pdfed-password').value;
     if (!pw) { showPdfEdStatus('error', '❌ Please enter the password'); return; }
     await loadPdfPreview(pw);
   });
-  // Also allow pressing Enter in the password field
   document.getElementById('pdfed-password').addEventListener('keydown', async e => {
-    if (e.key === 'Enter') {
-      const pw = e.target.value;
-      if (pw) await loadPdfPreview(pw);
-    }
+    if (e.key === 'Enter') { const pw = e.target.value; if (pw) await loadPdfPreview(pw); }
   });
 
   function showPdfEdStatus(type, msg) {
-    const el = document.getElementById('pdfed-status');
-    el.className = 'status-msg ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : 'status-info');
-    el.textContent = msg;
-    el.classList.remove('hidden');
+    // Show in either upload card status or canvas panel status
+    ['pdfed-status','pdfed-canvas-status'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.className = 'status-msg ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : 'status-info');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    });
   }
 
-  // ── render pages ──
+  // ── Render page thumbnails (left panel) ──
+  function renderThumbnails() {
+    const panel = document.getElementById('pdfed-thumbs');
+    if (!panel) return;
+    // clear existing thumbnails (keep the title)
+    panel.querySelectorAll('.pdfed-thumb-item').forEach(n => n.remove());
+    pdfedPages.forEach((pg, i) => {
+      const item = document.createElement('div');
+      item.className = 'pdfed-thumb-item' + (i === 0 ? ' active' : '');
+      const img = document.createElement('img');
+      img.src = 'data:image/png;base64,' + pg.img;
+      img.alt = 'Page ' + (i+1);
+      const lbl = document.createElement('div');
+      lbl.className = 'pdfed-thumb-label';
+      lbl.textContent = 'Page ' + (i+1);
+      item.appendChild(img);
+      item.appendChild(lbl);
+      item.addEventListener('click', () => {
+        panel.querySelectorAll('.pdfed-thumb-item').forEach(t => t.classList.remove('active'));
+        item.classList.add('active');
+        const pw = document.querySelector(`#pdfed-pages [data-page="${i}"]`);
+        if (pw) pw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      panel.appendChild(item);
+    });
+  }
+
+  // ── Render editing pages (middle panel) ──
   function renderPages() {
     const container = document.getElementById('pdfed-pages');
     container.innerHTML = '';
     pdfedPages.forEach(pg => {
       const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'position:relative;display:inline-block;box-shadow:0 4px 20px rgba(0,0,0,0.4);border-radius:4px;overflow:visible';
-      wrapper.dataset.page  = pg.index;
+      wrapper.style.cssText = 'position:relative;display:inline-block;box-shadow:0 4px 24px rgba(0,0,0,0.5);border-radius:4px;overflow:visible;user-select:none';
+      wrapper.dataset.page = pg.index;
 
       const img = document.createElement('img');
       img.src   = 'data:image/png;base64,' + pg.img;
-      img.style.cssText = 'display:block;max-width:900px;width:100%;height:auto;border-radius:4px';
+      img.style.cssText = 'display:block;max-width:860px;width:100%;height:auto;border-radius:4px;pointer-events:none';
       img.draggable = false;
 
       const label = document.createElement('div');
       label.textContent = `Page ${pg.index + 1}`;
-      label.style.cssText = 'text-align:center;padding:0.4rem;color:var(--text-muted,#888);font-size:0.82rem';
+      label.style.cssText = 'text-align:center;padding:0.4rem;color:#64748b;font-size:0.82rem;background:#0e0e18';
 
       wrapper.appendChild(img);
       wrapper.appendChild(label);
 
-      // Cache page dimensions once after image loads — avoids offsetWidth/offsetHeight reflow on every widget placement
       img.addEventListener('load', () => {
         _pageDims.set(wrapper, { pw: wrapper.offsetWidth, ph: img.offsetHeight });
-      }, { once: true });
+        wrapper._pdfW = pg.width_pt || wrapper.offsetWidth;
+        // If Edit-Text mode is already active, build overlays once image dimensions are known
+        if (activeTool === 'edittext') {
+          const blocks = textBlocksByPage[pg.index] || [];
+          blocks.forEach((span, si) => buildEditTextOverlay(span, si, pg.index, wrapper, img));
+        }      }, { once: true });
 
+      // Click handler — for point-placement tools
       wrapper.addEventListener('click', e => {
         if (e.target.closest('.pdfed-ann-widget')) return;
-        const rect  = img.getBoundingClientRect();
+        // Ignore if we just finished a drag-draw
+        if (wrapper._didDragDraw) { wrapper._didDragDraw = false; return; }
+        const rect = img.getBoundingClientRect();
         onPageClick(pg.index, (e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height, wrapper, img);
       });
+
+      // Drag-to-draw handler (highlight / rect / ellipse / whiteout)
+      setupDragDraw(wrapper, img, pg.index);
 
       container.appendChild(wrapper);
     });
     redrawAnnotationWidgets();
   }
 
-  function onPageClick(pageIndex, x_pct, y_pct, wrapper, img) {
-    if      (activeTool === 'text')      placeTextWidget(pageIndex, x_pct, y_pct, '', wrapper, img);
-    else if (activeTool === 'signature') { pendingClick = { pageIndex, x_pct, y_pct }; openSigModal(); }
-    else if (activeTool === 'checkbox')  placeCheckboxWidget(pageIndex, x_pct, y_pct, true, wrapper, img);
+  // ── Drag-to-draw for shape tools ──
+  function setupDragDraw(wrapper, img, pageIndex) {
+    let drawing = false, sx = 0, sy = 0, overlay = null;
+
+    wrapper.addEventListener('mousedown', e => {
+      if (!['highlight','rect','ellipse','whiteout'].includes(activeTool)) return;
+      if (e.target.closest('.pdfed-ann-widget')) return;
+      e.preventDefault();
+      drawing = true;
+      wrapper._didDragDraw = false;
+      const rect = img.getBoundingClientRect();
+      sx = e.clientX - rect.left;
+      sy = e.clientY - rect.top;
+
+      overlay = document.createElement('div');
+      overlay.className = 'pdfed-draw-overlay';
+      const color = getDrawColor();
+      overlay.style.cssText = `position:absolute;left:${sx}px;top:${sy}px;width:0;height:0;pointer-events:none;z-index:15;`;
+      if (activeTool === 'ellipse') {
+        overlay.style.borderRadius = '50%';
+        overlay.style.border = `2px solid ${color}`;
+        overlay.style.background = hexToRgba(document.getElementById('pdfed-color').value, 0.15);
+      } else if (activeTool === 'rect') {
+        overlay.style.border = `${document.getElementById('pdfed-stroke-width').value || 2}px solid ${color}`;
+        overlay.style.background = hexToRgba(document.getElementById('pdfed-color').value, 0.1);
+      } else if (activeTool === 'highlight') {
+        overlay.style.background = hlColor;
+        overlay.style.mixBlendMode = 'multiply';
+      } else if (activeTool === 'whiteout') {
+        overlay.style.background = 'rgba(255,255,255,1)';
+        overlay.style.border = '1px dashed #aaa';
+      }
+      wrapper.appendChild(overlay);
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!drawing || !overlay) return;
+      const rect = img.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      const x = Math.min(sx, cx), y = Math.min(sy, cy);
+      const w = Math.abs(cx - sx), h = Math.abs(cy - sy);
+      overlay.style.left   = x + 'px';
+      overlay.style.top    = y + 'px';
+      overlay.style.width  = w + 'px';
+      overlay.style.height = h + 'px';
+      if (w > 5 || h > 5) wrapper._didDragDraw = true;
+    });
+
+    document.addEventListener('mouseup', e => {
+      if (!drawing) return;
+      drawing = false;
+      if (!overlay) return;
+      if (!wrapper._didDragDraw) { overlay.remove(); overlay = null; return; }
+      const rect = img.getBoundingClientRect();
+      const ex = e.clientX - rect.left;
+      const ey = e.clientY - rect.top;
+      const imgW = img.offsetWidth, imgH = img.offsetHeight;
+      const x1 = Math.min(sx, ex) / imgW, y1 = Math.min(sy, ey) / imgH;
+      const x2 = Math.max(sx, ex) / imgW, y2 = Math.max(sy, ey) / imgH;
+      if ((x2 - x1) < 0.005 && (y2 - y1) < 0.005) { overlay.remove(); overlay = null; return; }
+
+      overlay.remove(); overlay = null;
+
+      const strokeW = parseInt(document.getElementById('pdfed-stroke-width')?.value) || 2;
+      const opacity = (parseInt(document.getElementById('pdfed-opacity')?.value) || 80) / 100;
+      const color   = document.getElementById('pdfed-color').value;
+      const ann = {
+        page: pageIndex, type: activeTool,
+        x1_pct: x1, y1_pct: y1, x2_pct: x2, y2_pct: y2,
+        color, stroke_width: strokeW, opacity,
+        hl_color: hlColor
+      };
+      annotations.push(ann);
+      redrawAnnotationWidgets();
+      updateAnnCount();
+    });
   }
 
-  // Returns cached page dimensions, falling back to live read (and caching the result)
+  function getDrawColor() {
+    const c = document.getElementById('pdfed-color').value;
+    if (activeTool === 'highlight') return hlColor;
+    return c;
+  }
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function onPageClick(pageIndex, x_pct, y_pct, wrapper, img) {
+    if      (activeTool === 'text')      placeTextWidget(pageIndex, x_pct, y_pct, '', wrapper, img);
+    else if (activeTool === 'note')      placeNoteWidget(pageIndex, x_pct, y_pct, wrapper, img);
+    else if (activeTool === 'signature') { pendingClick = { pageIndex, x_pct, y_pct }; openSigModal(); }
+    else if (activeTool === 'checkbox')  placeCheckboxWidget(pageIndex, x_pct, y_pct, true, wrapper, img);
+    else if (activeTool === 'image' && window._pdfedPendingImg) {
+      placeImageWidget(pageIndex, x_pct, y_pct, window._pdfedPendingImg, wrapper, img);
+      window._pdfedPendingImg = null;
+      showPdfEdStatus('success', '🖼 Image placed! Click again or choose another image.');
+    }
+  }
+
   function getPageDims(wrapper, img) {
     let d = _pageDims.get(wrapper);
     if (!d) { d = { pw: wrapper.offsetWidth, ph: img.offsetHeight }; _pageDims.set(wrapper, d); }
@@ -2102,9 +2493,8 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   }
 
   // ════════════════════════════════════════
-  // SHARED HELPERS — drag & resize
+  // DRAG / RESIZE HELPERS
   // ════════════════════════════════════════
-
   function makeDraggable(widget, handle, wrapper, pageImg) {
     handle.addEventListener('mousedown', e => {
       if (e.target.tagName === 'BUTTON' || e.target.closest('[data-resize]')) return;
@@ -2112,28 +2502,20 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       const startX = e.clientX, startY = e.clientY;
       const startL = parseFloat(widget.style.left) || 0;
       const startT = parseFloat(widget.style.top)  || 0;
-      // Read layout ONCE before any writes to avoid forced reflow on every mousemove
-      const wrapW = wrapper.offsetWidth;
-      const imgH  = pageImg.offsetHeight;
+      const wrapW  = wrapper.offsetWidth;
+      const imgH   = pageImg.offsetHeight;
       widget.style.zIndex = '20';
       function onMove(ev) {
-        const newL = startL + ev.clientX - startX;
-        const newT = startT + ev.clientY - startY;
-        widget.style.left = newL + 'px';
-        widget.style.top  = newT + 'px';
+        widget.style.left = (startL + ev.clientX - startX) + 'px';
+        widget.style.top  = (startT + ev.clientY - startY) + 'px';
         const ann = widget._ann;
-        if (ann) {
-          ann.x_pct = newL / wrapW;
-          ann.y_pct = newT / imgH;
-        }
+        if (ann) { ann.x_pct = parseFloat(widget.style.left) / wrapW; ann.y_pct = parseFloat(widget.style.top) / imgH; }
       }
       function onUp() { widget.style.zIndex = '10'; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup',   onUp);
     });
   }
-
-  // getStart() → snapshot of sizes; applyDelta(snapshot, dx, dy) → resize
   function makeResizable(handle, getStart, applyDelta) {
     handle.dataset.resize = '1';
     handle.addEventListener('mousedown', e => {
@@ -2146,15 +2528,12 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       document.addEventListener('mouseup',   onUp);
     });
   }
-
   function resizeHandle() {
     const h = document.createElement('div');
-    h.title = 'Drag to resize';
-    h.innerHTML = '⌟';
+    h.title = 'Drag to resize'; h.innerHTML = '⌟';
     h.style.cssText = 'position:absolute;bottom:-7px;right:-7px;width:16px;height:16px;background:#6366f1;color:#fff;border-radius:3px;cursor:se-resize;display:flex;align-items:center;justify-content:center;font-size:11px;user-select:none;z-index:12;line-height:1';
     return h;
   }
-
   function deleteHandle(cb) {
     const d = document.createElement('button');
     d.textContent = '✕'; d.title = 'Remove';
@@ -2162,19 +2541,14 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     d.addEventListener('click', e => { e.stopPropagation(); cb(); });
     return d;
   }
-
-  // Duplicate button — top-left of widget
   function duplicateHandle(getAnn) {
     const d = document.createElement('button');
     d.textContent = '⧉'; d.title = 'Duplicate';
     d.style.cssText = 'position:absolute;top:-8px;left:-8px;background:#10b981;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0;z-index:11';
     d.addEventListener('click', e => {
       e.stopPropagation();
-      const src = getAnn();
-      if (!src) return;
-      // Clone with small offset so it doesn't sit exactly on top
-      const clone = Object.assign({}, src, { x_pct: src.x_pct + 0.03, y_pct: src.y_pct + 0.03 });
-      annotations.push(clone);
+      const src = getAnn(); if (!src) return;
+      annotations.push(Object.assign({}, src, { x_pct: (src.x_pct||0) + 0.03, y_pct: (src.y_pct||0) + 0.03 }));
       redrawAnnotationWidgets();
     });
     return d;
@@ -2184,8 +2558,12 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   // TEXT WIDGET
   // ════════════════════════════════════════
   function placeTextWidget(pageIndex, x_pct, y_pct, initialText, wrapper, img, annIndex) {
-    const fontSize = parseInt(document.getElementById('pdfed-fontsize').value) || 14;
-    const color    = document.getElementById('pdfed-color').value;
+    const fontSize   = parseInt(document.getElementById('pdfed-fontsize').value) || 14;
+    const color      = document.getElementById('pdfed-color').value;
+    const fontFamily = document.getElementById('pdfed-fontfamily')?.value || 'Arial';
+    const bold       = document.getElementById('pdfed-bold')?.classList.contains('active');
+    const italic     = document.getElementById('pdfed-italic')?.classList.contains('active');
+    const underline  = document.getElementById('pdfed-underline')?.classList.contains('active');
     const { pw, ph } = getPageDims(wrapper, img);
 
     const widget = document.createElement('div');
@@ -2198,23 +2576,24 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
 
     const input = document.createElement('input');
     input.type = 'text'; input.value = initialText; input.placeholder = 'Type here…';
-    input.style.cssText = `font-size:${fontSize}px;color:${color};background:rgba(255,255,200,0.95);border:1.5px dashed #f59e0b;border-left:none;border-radius:0 4px 4px 0;padding:2px 6px;width:130px;min-width:50px;outline:none;font-family:inherit;cursor:text`;
+    const fwStyle = bold ? 'bold' : 'normal';
+    const fsStyle = italic ? 'italic' : 'normal';
+    const tdStyle = underline ? 'underline' : 'none';
+    input.style.cssText = `font-size:${fontSize}px;font-family:${fontFamily};font-weight:${fwStyle};font-style:${fsStyle};text-decoration:${tdStyle};color:${color};background:rgba(255,255,200,0.95);border:1.5px dashed #f59e0b;border-left:none;border-radius:0 4px 4px 0;padding:2px 6px;width:130px;min-width:50px;outline:none;cursor:text`;
 
     const rh = resizeHandle();
     widget.appendChild(grip);
     widget.appendChild(input);
-    widget.appendChild(deleteHandle(() => { annotations.splice(annIndex, 1); widget.remove(); updateAnnCount(); redrawAnnotationWidgets(); }));
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
     widget.appendChild(duplicateHandle(() => widget._ann));
     widget.appendChild(rh);
     wrapper.appendChild(widget);
 
     let ann;
-    if (annIndex !== undefined) {
-      ann = annotations[annIndex];
-    } else {
-      ann = { page: pageIndex, type: 'text', x_pct, y_pct, text: initialText, font_size: fontSize, color };
+    if (annIndex !== undefined) { ann = annotations[annIndex]; }
+    else {
+      ann = { page: pageIndex, type: 'text', x_pct, y_pct, text: initialText, font_size: fontSize, font_family: fontFamily, color, bold, italic, underline };
       annotations.push(ann);
-      annIndex = annotations.length - 1;
     }
     widget._ann = ann;
 
@@ -2223,15 +2602,171 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       () => ({ w: input.offsetWidth, fs: parseFloat(input.style.fontSize) || fontSize }),
       ({ w, fs }, dx, dy) => {
         input.style.width    = Math.max(50, w + dx) + 'px';
-        const nfs = Math.max(6, Math.min(72, fs + dy * 0.25));
+        const nfs = Math.max(6, Math.min(96, fs + dy * 0.25));
         input.style.fontSize = nfs + 'px';
         ann.font_size = nfs;
       }
     );
-
     input.addEventListener('input', () => { ann.text = input.value; updateAnnCount(); });
     input.focus();
     updateAnnCount();
+  }
+
+  // ════════════════════════════════════════
+  // STICKY NOTE WIDGET
+  // ════════════════════════════════════════
+  function placeNoteWidget(pageIndex, x_pct, y_pct, wrapper, img, annIndex) {
+    const { pw, ph } = getPageDims(wrapper, img);
+    const widget = document.createElement('div');
+    widget.className = 'pdfed-ann-widget';
+    widget.style.cssText = `position:absolute;left:${x_pct*pw}px;top:${y_pct*ph}px;z-index:10;width:180px;overflow:visible;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.3)`;
+
+    const header = document.createElement('div');
+    header.style.cssText = 'background:#f59e0b;color:#fff;padding:4px 8px;border-radius:6px 6px 0 0;font-size:0.72rem;font-weight:700;cursor:move;display:flex;align-items:center;justify-content:space-between;user-select:none';
+    header.innerHTML = '<span>💬 Note</span>';
+
+    const ta = document.createElement('textarea');
+    ta.placeholder = 'Type note here…';
+    ta.style.cssText = 'width:100%;height:80px;resize:both;background:#fffde7;border:none;border-radius:0 0 6px 6px;padding:6px 8px;font-size:0.82rem;color:#333;font-family:inherit;outline:none;box-sizing:border-box';
+
+    const rh = resizeHandle();
+    widget.appendChild(header);
+    widget.appendChild(ta);
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
+    widget.appendChild(rh);
+    wrapper.appendChild(widget);
+
+    let ann;
+    if (annIndex !== undefined) { ann = annotations[annIndex]; ta.value = ann.text || ''; }
+    else {
+      ann = { page: pageIndex, type: 'note', x_pct, y_pct, text: '' };
+      annotations.push(ann);
+    }
+    widget._ann = ann;
+    makeDraggable(widget, header, wrapper, img);
+    makeResizable(rh,
+      () => ({ w: widget.offsetWidth, h: ta.offsetHeight }),
+      ({ w, h }, dx, dy) => { widget.style.width = Math.max(120, w+dx)+'px'; ta.style.height = Math.max(50, h+dy)+'px'; }
+    );
+    ta.addEventListener('input', () => { ann.text = ta.value; updateAnnCount(); });
+    ta.focus();
+    updateAnnCount();
+  }
+
+  // ════════════════════════════════════════
+  // IMAGE WIDGET
+  // ════════════════════════════════════════
+  function placeImageWidget(pageIndex, x_pct, y_pct, imgData, wrapper, pageImg, annIndex) {
+    const { pw, ph } = getPageDims(wrapper, pageImg);
+    const initW = Math.round(pw * 0.3);
+
+    const widget = document.createElement('div');
+    widget.className = 'pdfed-ann-widget';
+    widget.style.cssText = `position:absolute;left:${x_pct*pw}px;top:${y_pct*ph}px;transform:translate(-50%,-50%);z-index:10;display:inline-block;overflow:visible`;
+
+    const im = document.createElement('img');
+    im.src = imgData; im.draggable = false;
+    im.style.cssText = `width:${initW}px;height:auto;border:2px dashed #10b981;border-radius:4px;cursor:move;display:block`;
+
+    const rh = resizeHandle();
+    let ann;
+    if (annIndex !== undefined) { ann = annotations[annIndex]; im.style.width = Math.round(ann.width_pct * pw) + 'px'; }
+    else {
+      ann = { page: pageIndex, type: 'image', x_pct, y_pct, img_data: imgData, width_pct: 0.3 };
+      annotations.push(ann);
+    }
+    widget._ann = ann;
+    widget.appendChild(im);
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
+    widget.appendChild(duplicateHandle(() => widget._ann));
+    widget.appendChild(rh);
+    wrapper.appendChild(widget);
+
+    makeDraggable(widget, im, wrapper, pageImg);
+    makeResizable(rh,
+      () => ({ w: im.offsetWidth }),
+      ({ w }, dx) => { const nw = Math.max(30, w+dx); im.style.width = nw+'px'; ann.width_pct = nw/pw; }
+    );
+    updateAnnCount();
+  }
+
+  // ════════════════════════════════════════
+  // SHAPE WIDGET (highlight / rect / ellipse / whiteout) — drawn as overlay divs
+  // ════════════════════════════════════════
+  function buildShapeWidget(ann, annIndex, pageWrapper) {
+    const img = pageWrapper.querySelector('img');
+    const { pw, ph } = getPageDims(pageWrapper, img);
+    const x = ann.x1_pct * pw, y = ann.y1_pct * ph;
+    const w = (ann.x2_pct - ann.x1_pct) * pw;
+    const h = (ann.y2_pct - ann.y1_pct) * ph;
+
+    const widget = document.createElement('div');
+    widget.className = 'pdfed-ann-widget';
+    widget.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;z-index:10;overflow:visible;cursor:move`;
+    widget._ann = ann;
+
+    applyShapeStyle(widget, ann, w, h);
+
+    // Drag to move
+    let startX, startY, startL, startT;
+    widget.addEventListener('mousedown', e => {
+      if (e.target.closest('[data-resize]') || e.target.tagName === 'BUTTON') return;
+      e.preventDefault(); e.stopPropagation();
+      startX = e.clientX; startY = e.clientY;
+      startL = parseFloat(widget.style.left)||0; startT = parseFloat(widget.style.top)||0;
+      const wrapW = pageWrapper.offsetWidth, imgH = img.offsetHeight;
+      widget.style.zIndex = '20';
+      function onMove(ev) {
+        const nl = startL + ev.clientX - startX;
+        const nt = startT + ev.clientY - startY;
+        widget.style.left = nl+'px'; widget.style.top = nt+'px';
+        const w2 = parseFloat(widget.style.width)||w;
+        const h2 = parseFloat(widget.style.height)||h;
+        ann.x1_pct = nl/wrapW; ann.y1_pct = nt/imgH;
+        ann.x2_pct = (nl+w2)/wrapW; ann.y2_pct = (nt+h2)/imgH;
+      }
+      function onUp() { widget.style.zIndex = '10'; document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    // Resize handle
+    const rh = resizeHandle();
+    widget.appendChild(rh);
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
+
+    makeResizable(rh,
+      () => ({ w: parseFloat(widget.style.width)||w, h: parseFloat(widget.style.height)||h }),
+      ({ w: sw, h: sh }, dx, dy) => {
+        const nw = Math.max(10, sw+dx), nh = Math.max(10, sh+dy);
+        widget.style.width = nw+'px'; widget.style.height = nh+'px';
+        applyShapeStyle(widget, ann, nw, nh);
+        ann.x2_pct = ann.x1_pct + nw/pw; ann.y2_pct = ann.y1_pct + nh/ph;
+      }
+    );
+    return widget;
+  }
+
+  function applyShapeStyle(widget, ann, w, h) {
+    const op = ann.opacity || 0.8;
+    if (ann.type === 'highlight') {
+      widget.style.background = ann.hl_color || 'rgba(253,230,138,0.55)';
+      widget.style.border = 'none';
+      widget.style.mixBlendMode = 'multiply';
+      widget.style.borderRadius = '2px';
+    } else if (ann.type === 'whiteout') {
+      widget.style.background = 'rgba(255,255,255,1)';
+      widget.style.border = '1px dashed #bbb';
+      widget.style.borderRadius = '2px';
+    } else if (ann.type === 'rect') {
+      widget.style.background = hexToRgba(ann.color, 0.1);
+      widget.style.border = `${ann.stroke_width||2}px solid ${ann.color}`;
+      widget.style.borderRadius = '3px';
+    } else if (ann.type === 'ellipse') {
+      widget.style.background = hexToRgba(ann.color, 0.12);
+      widget.style.border = `${ann.stroke_width||2}px solid ${ann.color}`;
+      widget.style.borderRadius = '50%';
+    }
   }
 
   // ════════════════════════════════════════
@@ -2241,7 +2776,6 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     const img = wrapper.querySelector('img');
     const { pw, ph } = getPageDims(wrapper, img);
     const initW = Math.round(pw * 0.25);
-
     const widget = document.createElement('div');
     widget.className = 'pdfed-ann-widget';
     widget.style.cssText = `position:absolute;left:${x_pct*pw}px;top:${y_pct*ph}px;transform:translate(0,-50%);z-index:10;display:inline-block;overflow:visible`;
@@ -2253,26 +2787,18 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     const rh = resizeHandle();
     const ann = { page: pageIndex, type: 'signature', x_pct, y_pct, img_data: imgData, width_pct: 0.25, height_pct: 0.08 };
     annotations.push(ann);
-    const annIndex = annotations.length - 1;
     widget._ann = ann;
 
     widget.appendChild(sigImg);
-    widget.appendChild(deleteHandle(() => { annotations.splice(annIndex, 1); widget.remove(); updateAnnCount(); redrawAnnotationWidgets(); }));
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
     widget.appendChild(duplicateHandle(() => widget._ann));
     widget.appendChild(rh);
     wrapper.appendChild(widget);
 
     makeDraggable(widget, sigImg, wrapper, img);
-    makeResizable(rh,
-      () => ({ w: sigImg.offsetWidth }),
-      ({ w }, dx) => {
-        const nw = Math.max(30, w + dx);
-        sigImg.style.width = nw + 'px';
-        ann.width_pct  = nw / pw;
-        ann.height_pct = ann.width_pct * 0.35;
-      }
-    );
-
+    makeResizable(rh, () => ({ w: sigImg.offsetWidth }), ({ w }, dx) => {
+      const nw = Math.max(30, w+dx); sigImg.style.width = nw+'px'; ann.width_pct = nw/pw;
+    });
     updateAnnCount();
   }
 
@@ -2291,72 +2817,67 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     box.title = 'Click to toggle';
     box.style.cssText = `width:${initSize}px;height:${initSize}px;border:2px solid #1e40af;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:${Math.round(initSize*0.72)}px;user-select:none;box-shadow:0 1px 4px rgba(0,0,0,0.18)`;
     box.textContent = checked ? '✔' : '';
-    box.addEventListener('click', e => { e.stopPropagation(); ann.checked = !ann.checked; box.textContent = ann.checked ? '✔' : ''; });
 
     const rh = resizeHandle();
-
     let ann;
-    if (annIndex !== undefined) {
-      ann = annotations[annIndex];
-    } else {
+    if (annIndex !== undefined) { ann = annotations[annIndex]; }
+    else {
       ann = { page: pageIndex, type: 'checkbox', x_pct, y_pct, checked, size: initSize };
       annotations.push(ann);
-      annIndex = annotations.length - 1;
     }
     widget._ann = ann;
+    box.addEventListener('click', e => { e.stopPropagation(); ann.checked = !ann.checked; box.textContent = ann.checked ? '✔' : ''; });
 
     widget.appendChild(box);
-    widget.appendChild(deleteHandle(() => { annotations.splice(annIndex, 1); widget.remove(); updateAnnCount(); redrawAnnotationWidgets(); }));
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
     widget.appendChild(duplicateHandle(() => widget._ann));
     widget.appendChild(rh);
     wrapper.appendChild(widget);
 
     makeDraggable(widget, box, wrapper, img);
-    makeResizable(rh,
-      () => ({ s: box.offsetWidth }),
-      ({ s }, dx, dy) => {
-        const ns = Math.max(12, Math.min(80, s + Math.max(dx, dy)));
-        box.style.width    = ns + 'px';
-        box.style.height   = ns + 'px';
-        box.style.fontSize = Math.round(ns * 0.72) + 'px';
-        ann.size = ns;
-      }
-    );
-
+    makeResizable(rh, () => ({ s: box.offsetWidth }), ({ s }, dx, dy) => {
+      const ns = Math.max(12, Math.min(80, s+Math.max(dx,dy)));
+      box.style.width = ns+'px'; box.style.height = ns+'px'; box.style.fontSize = Math.round(ns*0.72)+'px'; ann.size = ns;
+    });
     updateAnnCount();
   }
 
-  // ── build helpers for redraw ──
+  // ── Redraw all annotation widgets ──
+  function redrawAnnotationWidgets() {
+    document.querySelectorAll('.pdfed-ann-widget').forEach(w => w.remove()); // don't touch .pdfed-etxt-overlay
+    annotations.forEach((ann, i) => {
+      const pw = document.querySelector(`#pdfed-pages [data-page="${ann.page}"]`);
+      if (!pw) return;
+      const img = pw.querySelector('img');
+      if      (ann.type === 'text')      placeTextWidget(ann.page, ann.x_pct, ann.y_pct, ann.text||'', pw, img, i);
+      else if (ann.type === 'note')      placeNoteWidget(ann.page, ann.x_pct, ann.y_pct, pw, img, i);
+      else if (ann.type === 'signature') { pw.appendChild(buildSigWidget(ann, i, pw)); }
+      else if (ann.type === 'image')     { placeImageWidget(ann.page, ann.x_pct, ann.y_pct, ann.img_data, pw, img, i); }
+      else if (ann.type === 'checkbox')  { const w = buildCheckboxWidget(ann, i, pw); pw.appendChild(w); }
+      else if (['highlight','rect','ellipse','whiteout'].includes(ann.type)) { pw.appendChild(buildShapeWidget(ann, i, pw)); }
+      // edittext: visual state managed by overlay divs, not ann-widgets
+    });
+    updateAnnCount();
+  }
+
   function buildSigWidget(ann, annIndex, pageWrapper) {
     const img = pageWrapper.querySelector('img');
     const { pw, ph } = getPageDims(pageWrapper, img);
     const curW = Math.round(ann.width_pct * pw) || Math.round(pw * 0.25);
-
     const widget = document.createElement('div');
     widget.className = 'pdfed-ann-widget';
     widget.style.cssText = `position:absolute;left:${ann.x_pct*pw}px;top:${ann.y_pct*ph}px;transform:translate(0,-50%);z-index:10;display:inline-block;overflow:visible`;
     widget._ann = ann;
-
     const sigImg = document.createElement('img');
     sigImg.src = ann.img_data; sigImg.draggable = false;
     sigImg.style.cssText = `width:${curW}px;height:auto;border:1.5px dashed #6366f1;border-radius:4px;background:rgba(255,255,255,0.9);cursor:move;display:block`;
-
     const rh = resizeHandle();
     widget.appendChild(sigImg);
-    widget.appendChild(deleteHandle(() => { annotations.splice(annIndex, 1); widget.remove(); updateAnnCount(); redrawAnnotationWidgets(); }));
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
     widget.appendChild(duplicateHandle(() => widget._ann));
     widget.appendChild(rh);
-
     makeDraggable(widget, sigImg, pageWrapper, img);
-    makeResizable(rh,
-      () => ({ w: sigImg.offsetWidth }),
-      ({ w }, dx) => {
-        const nw = Math.max(30, w + dx);
-        sigImg.style.width = nw + 'px';
-        ann.width_pct  = nw / pw;
-        ann.height_pct = ann.width_pct * 0.35;
-      }
-    );
+    makeResizable(rh, () => ({ w: sigImg.offsetWidth }), ({ w }, dx) => { const nw = Math.max(30,w+dx); sigImg.style.width=nw+'px'; ann.width_pct=nw/pw; });
     return widget;
   }
 
@@ -2364,86 +2885,97 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     const img = pageWrapper.querySelector('img');
     const { pw, ph } = getPageDims(pageWrapper, img);
     const boxSize = ann.size || 22;
-
     const widget = document.createElement('div');
     widget.className = 'pdfed-ann-widget';
     widget.style.cssText = `position:absolute;left:${ann.x_pct*pw}px;top:${ann.y_pct*ph}px;transform:translate(-50%,-50%);z-index:10;display:inline-block;overflow:visible`;
     widget._ann = ann;
-
     const box = document.createElement('div');
     box.style.cssText = `width:${boxSize}px;height:${boxSize}px;border:2px solid #1e40af;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:${Math.round(boxSize*0.72)}px;user-select:none;box-shadow:0 1px 4px rgba(0,0,0,0.18)`;
     box.textContent = ann.checked ? '✔' : '';
     box.addEventListener('click', e => { e.stopPropagation(); ann.checked = !ann.checked; box.textContent = ann.checked ? '✔' : ''; });
-
     const rh = resizeHandle();
     widget.appendChild(box);
-    widget.appendChild(deleteHandle(() => { annotations.splice(annIndex, 1); widget.remove(); updateAnnCount(); redrawAnnotationWidgets(); }));
+    widget.appendChild(deleteHandle(() => { const idx = annotations.indexOf(widget._ann); if (idx>=0) annotations.splice(idx,1); widget.remove(); updateAnnCount(); }));
     widget.appendChild(duplicateHandle(() => widget._ann));
     widget.appendChild(rh);
-
     makeDraggable(widget, box, pageWrapper, img);
-    makeResizable(rh,
-      () => ({ s: box.offsetWidth }),
-      ({ s }, dx, dy) => {
-        const ns = Math.max(12, Math.min(80, s + Math.max(dx, dy)));
-        box.style.width    = ns + 'px';
-        box.style.height   = ns + 'px';
-        box.style.fontSize = Math.round(ns * 0.72) + 'px';
-        ann.size = ns;
-      }
-    );
-    return widget;
-  }
-
-  // ── redraw all annotations ──
-  function redrawAnnotationWidgets() {
-    document.querySelectorAll('.pdfed-ann-widget').forEach(w => w.remove());
-    annotations.forEach((ann, i) => {
-      const pw = document.querySelector(`[data-page="${ann.page}"]`);
-      if (!pw) return;
-      const img = pw.querySelector('img');
-      if      (ann.type === 'text')      placeTextWidget(ann.page, ann.x_pct, ann.y_pct, ann.text, pw, img, i);
-      else if (ann.type === 'signature') { const w = buildSigWidget(ann, i, pw); pw.appendChild(w); }
-      else if (ann.type === 'checkbox')  { const w = buildCheckboxWidget(ann, i, pw); pw.appendChild(w); }
+    makeResizable(rh, () => ({ s: box.offsetWidth }), ({ s }, dx, dy) => {
+      const ns = Math.max(12,Math.min(80,s+Math.max(dx,dy)));
+      box.style.width=ns+'px'; box.style.height=ns+'px'; box.style.fontSize=Math.round(ns*0.72)+'px'; ann.size=ns;
     });
-    updateAnnCount();
+    return widget;
   }
 
   function updateAnnCount() {
     const el = document.getElementById('pdfed-ann-count');
-    if (el) el.textContent = annotations.length + ' annotation' + (annotations.length !== 1 ? 's' : '');
+    if (el) el.textContent = annotations.length + (annotations.length !== 1 ? ' annotations' : ' annotation');
   }
 
-  // ── change PDF ──
-  document.getElementById('pdfed-change-btn').addEventListener('click', () => {
-    pdfedFile = null;
-    pdfedPages = [];
-    annotations = [];
+  // ── Close / Exit overlay ──
+  function closeEditor() {
     document.getElementById('pdfed-workspace').classList.add('hidden');
+    document.body.classList.remove('pdfed-open');
+  }
+
+  document.getElementById('pdfed-exit-btn').addEventListener('click', closeEditor);
+
+  // Escape key closes the editor
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !document.getElementById('pdfed-workspace').classList.contains('hidden')) {
+      closeEditor();
+    }
+  });
+
+  // ── Change PDF ──
+  document.getElementById('pdfed-change-btn').addEventListener('click', () => {
+    closeEditor();
+    pdfedFile = null; pdfedPages = []; annotations = [];
     document.getElementById('pdfed-upload-card').style.display = '';
     document.getElementById('pdfed-status').classList.add('hidden');
     document.getElementById('pdfed-file').value = '';
-    document.getElementById('pdfed-upload-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Scroll the upload card into view after a brief delay
+    setTimeout(() => {
+      const card = document.getElementById('pdfed-upload-card');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   });
 
-  // ── undo / clear ──
+  // ── Undo / Clear ──
+  // ── Reset a span's edited state when an edittext annotation is undone/cleared ──
+  function resetSpanEdited(ann) {
+    if (ann.type !== 'edittext') return;
+    const blocks = textBlocksByPage[ann.page] || [];
+    const span   = blocks[ann._spanIndex];
+    if (span) {
+      span._edited     = false;
+      span._editedText = undefined;
+    }
+  }
+
   document.getElementById('pdfed-undo-btn').addEventListener('click', () => {
     if (!annotations.length) return;
+    const last = annotations[annotations.length - 1];
+    resetSpanEdited(last);           // revert the span's visual state
     annotations.pop();
     redrawAnnotationWidgets();
-  });
-  document.getElementById('pdfed-clear-btn').addEventListener('click', () => {
-    annotations = [];
-    redrawAnnotationWidgets();
+    // Rebuild edit-text overlays so the reverted span shows correctly
+    if (activeTool === 'edittext') toggleEditTextOverlays(true);
   });
 
-  // ── save / download ──
+  document.getElementById('pdfed-clear-btn').addEventListener('click', () => {
+    // Reset every edittext span first
+    annotations.forEach(resetSpanEdited);
+    annotations = [];
+    redrawAnnotationWidgets();
+    if (activeTool === 'edittext') toggleEditTextOverlays(true);
+  });
+
+  // ── Save / Download ──
   document.getElementById('pdfed-save-btn').addEventListener('click', async () => {
     if (!pdfedFile) { showPdfEdStatus('error', '❌ No PDF loaded'); return; }
-    // sync live input values
-    document.querySelectorAll('.pdfed-ann-widget input[type=text]').forEach((inp, i) => {
-      const textAnns = annotations.filter(a => a.type === 'text');
-      if (textAnns[i]) textAnns[i].text = inp.value;
+    // Sync live input values
+    document.querySelectorAll('#pdfed-pages .pdfed-ann-widget input[type=text]').forEach(inp => {
+      if (inp._ann) inp._ann.text = inp.value;
     });
     showPdfEdStatus('info', '⏳ Generating PDF…');
     const fd = new FormData();
@@ -2457,7 +2989,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       const blob = await res.blob();
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = pdfedFile.name.replace('.pdf', '_filled.pdf');
+      a.download = pdfedFile.name.replace('.pdf','_edited.pdf');
       a.click();
       URL.revokeObjectURL(a.href);
       showPdfEdStatus('success', '✅ PDF downloaded!');
@@ -2471,55 +3003,47 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   const sigCanvas = document.getElementById('sig-canvas');
   const sigCtx    = sigCanvas.getContext('2d');
   let sigDrawing  = false, sigLastX = 0, sigLastY = 0;
+  function openSigModal() { sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height); sigModal.style.display='flex'; }
 
-  function openSigModal() { sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height); sigModal.style.display = 'flex'; }
-
-  document.getElementById('sig-cancel-btn').addEventListener('click', () => { sigModal.style.display = 'none'; pendingClick = null; });
-  document.getElementById('sig-clear-btn') .addEventListener('click', () => { sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height); });
+  document.getElementById('sig-cancel-btn') .addEventListener('click', () => { sigModal.style.display='none'; pendingClick=null; });
+  document.getElementById('sig-clear-btn')  .addEventListener('click', () => { sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height); });
   document.getElementById('sig-confirm-btn').addEventListener('click', () => {
     const imgData = sigCanvas.toDataURL('image/png');
     sigModal.style.display = 'none';
     if (pendingClick) {
       const { pageIndex, x_pct, y_pct } = pendingClick; pendingClick = null;
-      const pw = document.querySelector(`[data-page="${pageIndex}"]`);
+      const pw = document.querySelector(`#pdfed-pages [data-page="${pageIndex}"]`);
       if (pw) placeSignatureWidget(pageIndex, x_pct, y_pct, imgData, pw);
     }
   });
 
-  // Cached per-stroke values to avoid getBoundingClientRect on every move
-  let _modalSigRect = null, _modalSigScaleX = 1, _modalSigScaleY = 1, _modalSigLineW = 3;
-
+  let _modalSigRect=null, _modalSigScaleX=1, _modalSigScaleY=1, _modalSigLineW=3;
   function cacheSigRect() {
-    _modalSigRect   = sigCanvas.getBoundingClientRect();
-    _modalSigScaleX = sigCanvas.width  / _modalSigRect.width;
-    _modalSigScaleY = sigCanvas.height / _modalSigRect.height;
-    _modalSigLineW  = parseInt(document.getElementById('sig-pen-width').value) || 3;
+    _modalSigRect=sigCanvas.getBoundingClientRect();
+    _modalSigScaleX=sigCanvas.width/_modalSigRect.width;
+    _modalSigScaleY=sigCanvas.height/_modalSigRect.height;
+    _modalSigLineW=parseInt(document.getElementById('sig-pen-width').value)||3;
   }
   function getSigPos(e) {
     const src = e.touches ? e.touches[0] : e;
-    return {
-      x: (src.clientX - _modalSigRect.left) * _modalSigScaleX,
-      y: (src.clientY - _modalSigRect.top)  * _modalSigScaleY
-    };
+    return { x:(src.clientX-_modalSigRect.left)*_modalSigScaleX, y:(src.clientY-_modalSigRect.top)*_modalSigScaleY };
   }
   function sigDraw(e) {
     if (!sigDrawing) return;
     const p = getSigPos(e);
-    sigCtx.beginPath(); sigCtx.moveTo(sigLastX, sigLastY); sigCtx.lineTo(p.x, p.y);
-    sigCtx.strokeStyle = '#1a1a2e';
-    sigCtx.lineWidth   = _modalSigLineW;
-    sigCtx.lineCap = sigCtx.lineJoin = 'round';
+    sigCtx.beginPath(); sigCtx.moveTo(sigLastX,sigLastY); sigCtx.lineTo(p.x,p.y);
+    sigCtx.strokeStyle='#1a1a2e'; sigCtx.lineWidth=_modalSigLineW; sigCtx.lineCap=sigCtx.lineJoin='round';
     sigCtx.stroke();
-    sigLastX = p.x; sigLastY = p.y;
+    sigLastX=p.x; sigLastY=p.y;
   }
-  sigCanvas.addEventListener('mousedown',  e => { cacheSigRect(); sigDrawing = true; const p = getSigPos(e); sigLastX = p.x; sigLastY = p.y; });
+  sigCanvas.addEventListener('mousedown',  e=>{cacheSigRect();sigDrawing=true;const p=getSigPos(e);sigLastX=p.x;sigLastY=p.y;});
   sigCanvas.addEventListener('mousemove',  sigDraw);
-  sigCanvas.addEventListener('mouseup',    () => sigDrawing = false);
-  sigCanvas.addEventListener('mouseleave', () => sigDrawing = false);
-  sigCanvas.addEventListener('touchstart', e => { e.preventDefault(); cacheSigRect(); sigDrawing = true; const p = getSigPos(e); sigLastX = p.x; sigLastY = p.y; }, { passive: false });
-  sigCanvas.addEventListener('touchmove',  e => { e.preventDefault(); sigDraw(e); }, { passive: false });
-  sigCanvas.addEventListener('touchend',   () => sigDrawing = false);
+  sigCanvas.addEventListener('mouseup',    ()=>sigDrawing=false);
+  sigCanvas.addEventListener('mouseleave', ()=>sigDrawing=false);
+  sigCanvas.addEventListener('touchstart', e=>{e.preventDefault();cacheSigRect();sigDrawing=true;const p=getSigPos(e);sigLastX=p.x;sigLastY=p.y;},{passive:false});
+  sigCanvas.addEventListener('touchmove',  e=>{e.preventDefault();sigDraw(e);},{passive:false});
+  sigCanvas.addEventListener('touchend',   ()=>sigDrawing=false);
 
-  } catch(e) { console.error('[PDF Editor] init error:', e); }
+  } catch(e) { console.error('[PDF Editor v2] init error:', e); }
 })(); // end PDF Editor IIFE
 
