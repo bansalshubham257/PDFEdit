@@ -105,7 +105,7 @@
     .footer-col a{color:#94a3b8;text-decoration:none;font-size:.83rem;transition:color .15s}
     .footer-col a:hover{color:#c7d2fe}
     .footer-bottom{max-width:1100px;margin:1.5rem auto 0;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
-    .footer-bottom p{color:#334155;font-size:.78rem;margin:0}
+    .footer-bottom p{color:#94a3b8;font-size:.78rem;margin:0}
   </style>
 </head>
 <body>
@@ -285,8 +285,8 @@
         <button class="chip" data-from="PNG" data-to="JPG">PNG → JPG</button>
         <button class="chip" data-from="WEBP" data-to="JPG">WEBP → JPG</button>
         <button class="chip" data-from="WEBP" data-to="PNG">WEBP → PNG</button>
-        <button class="chip {% if not heif_available %}chip-disabled{% endif %}" data-from="HEIC" data-to="JPG" {% if not heif_available %}title="HEIC support not installed on server"{% endif %}>HEIC → JPG {% if not heif_available %}<span class="badge-warn">!</span>{% endif %}</button>
-        <button class="chip {% if not cairo_available %}chip-disabled{% endif %}" data-from="SVG" data-to="PNG" {% if not cairo_available %}title="SVG support not installed on server"{% endif %}>SVG → PNG {% if not cairo_available %}<span class="badge-warn">!</span>{% endif %}</button>
+        <button class="chip {% if not heif_available %}chip-disabled{% endif %}" data-from="HEIC" data-to="JPG" {% if not heif_available %}disabled aria-disabled="true" title="HEIC support not installed on server"{% endif %}>HEIC → JPG {% if not heif_available %}<span class="badge-warn">!</span>{% endif %}</button>
+        <button class="chip {% if not cairo_available %}chip-disabled{% endif %}" data-from="SVG" data-to="PNG" {% if not cairo_available %}disabled aria-disabled="true" title="SVG support not installed on server"{% endif %}>SVG → PNG {% if not cairo_available %}<span class="badge-warn">!</span>{% endif %}</button>
         <button class="chip" data-from="BMP" data-to="JPG">BMP → JPG</button>
         <button class="chip" data-from="TIFF" data-to="PNG">TIFF → PNG</button>
         <button class="chip" data-from="ANY" data-to="WEBP">ANY → WEBP</button>
@@ -1751,15 +1751,15 @@
       <p>Beyond PDF editing, EditPDFForm also offers free image tools: compress JPG to 50KB, resize images to exact dimensions, convert between JPG/PNG/WEBP/HEIC formats, make passport-size photos, and remove image backgrounds using AI.</p>
       <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:.5rem">
         <a href="/fill-pdf-form-online" style="color:#818cf8;text-decoration:none;font-size:.82rem">Fill PDF Form Online →</a>
-        <span style="color:#334155">·</span>
+        <span style="color:#64748b">·</span>
         <a href="/edit-pdf-online" style="color:#818cf8;text-decoration:none;font-size:.82rem">Edit PDF Online →</a>
-        <span style="color:#334155">·</span>
+        <span style="color:#64748b">·</span>
         <a href="/sign-pdf-online" style="color:#818cf8;text-decoration:none;font-size:.82rem">Sign PDF Online →</a>
-        <span style="color:#334155">·</span>
+        <span style="color:#64748b">·</span>
         <a href="/merge-pdf" style="color:#818cf8;text-decoration:none;font-size:.82rem">Merge PDF →</a>
-        <span style="color:#334155">·</span>
+        <span style="color:#64748b">·</span>
         <a href="/compress-jpg-to-50kb" style="color:#818cf8;text-decoration:none;font-size:.82rem">Compress Image →</a>
-        <span style="color:#334155">·</span>
+        <span style="color:#64748b">·</span>
         <a href="/passport-photo-maker" style="color:#818cf8;text-decoration:none;font-size:.82rem">Passport Photo →</a>
       </div>
     </div>
