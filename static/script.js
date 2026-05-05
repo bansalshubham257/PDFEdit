@@ -975,29 +975,32 @@ function initSigPad() {
 }
 
 // ── Returns physical-pixel coords scaled from CSS pointer event ──
-function sigPos(e) {
-  const r     = sigPadCanvas.getBoundingClientRect();
-  const scaleX = sigPadCanvas.width  / r.width;
-  const scaleY = sigPadCanvas.height / r.height;
-  const src   = e.touches ? e.touches[0] : e;
+// rect and scale are passed in (cached at stroke start to avoid per-move reflow)
+function sigPos(e, rect, scaleX, scaleY) {
+  const src = e.touches ? e.touches[0] : e;
   return {
-    x: (src.clientX - r.left) * scaleX,
-    y: (src.clientY - r.top)  * scaleY,
+    x: (src.clientX - rect.left) * scaleX,
+    y: (src.clientY - rect.top)  * scaleY,
   };
 }
+
+// Per-stroke cached values (set in sigStart, reused in sigMove)
+let _sigRect = null, _sigScaleX = 1, _sigScaleY = 1;
 
 function sigStart(e) {
   e.preventDefault();
   initSigPad();
   sigStrokes.push(sigPadCanvas.toDataURL('image/png')); // snapshot before stroke (for undo)
   sigPadDrawing = true;
-  const { x, y } = sigPos(e);
-  // Scale pen thickness to physical pixels so it looks consistent on screen
-  const displayScale = sigPadCanvas.width / sigPadCanvas.getBoundingClientRect().width;
+  // Read layout ONCE here — before any writes — and cache for sigMove
+  _sigRect   = sigPadCanvas.getBoundingClientRect();
+  _sigScaleX = sigPadCanvas.width  / _sigRect.width;
+  _sigScaleY = sigPadCanvas.height / _sigRect.height;
+  const { x, y } = sigPos(e, _sigRect, _sigScaleX, _sigScaleY);
   sigPadCtx.beginPath();
   sigPadCtx.moveTo(x, y);
   sigPadCtx.strokeStyle = sigPadColor;
-  sigPadCtx.lineWidth   = sigPadThickness * displayScale;
+  sigPadCtx.lineWidth   = sigPadThickness * _sigScaleX;
   sigPadCtx.lineCap     = 'round';
   sigPadCtx.lineJoin    = 'round';
 }
@@ -1005,7 +1008,7 @@ function sigStart(e) {
 function sigMove(e) {
   if (!sigPadDrawing) return;
   e.preventDefault();
-  const { x, y } = sigPos(e);
+  const { x, y } = sigPos(e, _sigRect, _sigScaleX, _sigScaleY);
   sigPadCtx.lineTo(x, y);
   sigPadCtx.stroke();
   if (!sigHasDrawn) {
@@ -2059,14 +2062,19 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       const startX = e.clientX, startY = e.clientY;
       const startL = parseFloat(widget.style.left) || 0;
       const startT = parseFloat(widget.style.top)  || 0;
+      // Read layout ONCE before any writes to avoid forced reflow on every mousemove
+      const wrapW = wrapper.offsetWidth;
+      const imgH  = pageImg.offsetHeight;
       widget.style.zIndex = '20';
       function onMove(ev) {
-        widget.style.left = (startL + ev.clientX - startX) + 'px';
-        widget.style.top  = (startT + ev.clientY - startY) + 'px';
+        const newL = startL + ev.clientX - startX;
+        const newT = startT + ev.clientY - startY;
+        widget.style.left = newL + 'px';
+        widget.style.top  = newT + 'px';
         const ann = widget._ann;
         if (ann) {
-          ann.x_pct = parseFloat(widget.style.left) / wrapper.offsetWidth;
-          ann.y_pct = parseFloat(widget.style.top)  / pageImg.offsetHeight;
+          ann.x_pct = newL / wrapW;
+          ann.y_pct = newT / imgH;
         }
       }
       function onUp() { widget.style.zIndex = '10'; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
@@ -2428,26 +2436,37 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     }
   });
 
+  // Cached per-stroke values to avoid getBoundingClientRect on every move
+  let _modalSigRect = null, _modalSigScaleX = 1, _modalSigScaleY = 1, _modalSigLineW = 3;
+
+  function cacheSigRect() {
+    _modalSigRect   = sigCanvas.getBoundingClientRect();
+    _modalSigScaleX = sigCanvas.width  / _modalSigRect.width;
+    _modalSigScaleY = sigCanvas.height / _modalSigRect.height;
+    _modalSigLineW  = parseInt(document.getElementById('sig-pen-width').value) || 3;
+  }
   function getSigPos(e) {
-    const r = sigCanvas.getBoundingClientRect();
     const src = e.touches ? e.touches[0] : e;
-    return { x: (src.clientX - r.left) * sigCanvas.width / r.width, y: (src.clientY - r.top) * sigCanvas.height / r.height };
+    return {
+      x: (src.clientX - _modalSigRect.left) * _modalSigScaleX,
+      y: (src.clientY - _modalSigRect.top)  * _modalSigScaleY
+    };
   }
   function sigDraw(e) {
     if (!sigDrawing) return;
     const p = getSigPos(e);
     sigCtx.beginPath(); sigCtx.moveTo(sigLastX, sigLastY); sigCtx.lineTo(p.x, p.y);
     sigCtx.strokeStyle = '#1a1a2e';
-    sigCtx.lineWidth   = parseInt(document.getElementById('sig-pen-width').value) || 3;
+    sigCtx.lineWidth   = _modalSigLineW;
     sigCtx.lineCap = sigCtx.lineJoin = 'round';
     sigCtx.stroke();
     sigLastX = p.x; sigLastY = p.y;
   }
-  sigCanvas.addEventListener('mousedown',  e => { sigDrawing = true; const p = getSigPos(e); sigLastX = p.x; sigLastY = p.y; });
+  sigCanvas.addEventListener('mousedown',  e => { cacheSigRect(); sigDrawing = true; const p = getSigPos(e); sigLastX = p.x; sigLastY = p.y; });
   sigCanvas.addEventListener('mousemove',  sigDraw);
   sigCanvas.addEventListener('mouseup',    () => sigDrawing = false);
   sigCanvas.addEventListener('mouseleave', () => sigDrawing = false);
-  sigCanvas.addEventListener('touchstart', e => { e.preventDefault(); sigDrawing = true; const p = getSigPos(e); sigLastX = p.x; sigLastY = p.y; }, { passive: false });
+  sigCanvas.addEventListener('touchstart', e => { e.preventDefault(); cacheSigRect(); sigDrawing = true; const p = getSigPos(e); sigLastX = p.x; sigLastY = p.y; }, { passive: false });
   sigCanvas.addEventListener('touchmove',  e => { e.preventDefault(); sigDraw(e); }, { passive: false });
   sigCanvas.addEventListener('touchend',   () => sigDrawing = false);
 
