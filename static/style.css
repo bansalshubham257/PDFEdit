@@ -693,3 +693,214 @@ body {
 
 /* ── Section label ── */
 .section-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#818cf8; }
+
+/* ══════════════════════════════════════════════════════════
+   NEW PDF EDITOR — FULL-PAGE OVERLAY WORKSPACE
+══════════════════════════════════════════════════════════ */
+
+/* Full-page overlay */
+.pdfed-fullpage {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d1a;
+  overflow: hidden;
+  animation: pdfedFadeIn .22s ease;
+}
+.pdfed-fullpage.hidden { display: none !important; }
+
+@keyframes pdfedFadeIn {
+  from { opacity: 0; transform: scale(.98); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+/* Prevent page body from scrolling while overlay is open */
+body.pdfed-open { overflow: hidden; }
+
+/* Top action bar */
+.pdfed-topbar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: .5rem;
+  background: #12122a;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  padding: .55rem 1rem;
+  flex-shrink: 0;
+  min-height: 52px;
+}
+.pdfed-topbar-left  { display: flex; align-items: center; gap: .65rem; min-width: 0; flex: 1; overflow: hidden; }
+.pdfed-topbar-right { display: flex; align-items: center; gap: .45rem; flex-shrink: 0; flex-wrap: wrap; }
+
+.pdfed-logo-mark { font-size: 1.35rem; flex-shrink: 0; }
+
+.pdfed-filename {
+  font-size: .88rem; font-weight: 700; color: #e2e8f0;
+  max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pdfed-ann-badge {
+  background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.4);
+  color: #a5b4fc; font-size: .72rem; font-weight: 600;
+  padding: .2rem .6rem; border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+}
+.pdfed-action-btn {
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  color: #ccc; font-size: .8rem; font-weight: 600; font-family: inherit;
+  padding: .38rem .82rem; border-radius: 8px; cursor: pointer; transition: all .18s; white-space: nowrap;
+}
+.pdfed-action-btn:hover { background: rgba(255,255,255,.14); color: #fff; }
+.pdfed-save-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  color: #fff !important; border-color: transparent !important;
+  box-shadow: 0 3px 14px rgba(99,102,241,.35);
+}
+.pdfed-save-btn:hover { box-shadow: 0 5px 20px rgba(99,102,241,.55); transform: translateY(-1px); }
+
+/* Exit button — red, prominent */
+.pdfed-exit-btn {
+  background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.4);
+  color: #f87171; font-size: .82rem; font-weight: 700; font-family: inherit;
+  padding: .38rem .9rem; border-radius: 8px; cursor: pointer; transition: all .18s; white-space: nowrap;
+  margin-left: .25rem;
+}
+.pdfed-exit-btn:hover { background: rgba(239,68,68,.35); color: #fff; border-color: #ef4444; }
+
+/* 3-column layout — fills remaining height */
+.pdfed-editor-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0; /* critical: lets flex children scroll independently */
+  overflow: hidden;
+}
+
+/* LEFT — thumbnails */
+.pdfed-thumb-panel {
+  width: 155px; flex-shrink: 0;
+  background: rgba(255,255,255,.025);
+  border-right: 1px solid rgba(255,255,255,.07);
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column;
+}
+.pdfed-panel-title {
+  font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+  color: #64748b; padding: .65rem .75rem .45rem;
+  border-bottom: 1px solid rgba(255,255,255,.06); flex-shrink: 0;
+}
+.pdfed-thumb-item {
+  cursor: pointer; padding: .5rem .6rem;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  transition: background .15s;
+}
+.pdfed-thumb-item:hover  { background: rgba(99,102,241,.1); }
+.pdfed-thumb-item.active { background: rgba(99,102,241,.2); }
+.pdfed-thumb-item img    { width: 100%; border-radius: 3px; border: 1px solid rgba(255,255,255,.1); display: block; }
+.pdfed-thumb-label { font-size: .66rem; color: #94a3b8; font-weight: 600; }
+
+/* MIDDLE — canvas */
+.pdfed-canvas-panel {
+  flex: 1; overflow-y: auto; overflow-x: auto;
+  background: #141422;
+}
+
+/* RIGHT — tools sidebar */
+.pdfed-tools-panel {
+  width: 248px; flex-shrink: 0;
+  background: rgba(255,255,255,.025);
+  border-left: 1px solid rgba(255,255,255,.07);
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column;
+  padding: .75rem .7rem;
+  gap: .45rem;
+}
+.pdfed-tool-group { display: flex; flex-direction: column; gap: .28rem; }
+.pdfed-tool-group-label {
+  font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .09em;
+  color: #475569; padding: .25rem 0 .05rem;
+}
+.pdfed-tool-btn {
+  background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.09);
+  color: #cbd5e1; font-size: .83rem; font-weight: 500; font-family: inherit;
+  padding: .44rem .8rem; border-radius: 8px; cursor: pointer; text-align: left;
+  transition: all .17s; white-space: nowrap;
+}
+.pdfed-tool-btn:hover  { background: rgba(99,102,241,.18); border-color: rgba(99,102,241,.45); color: #a5b4fc; }
+.pdfed-tool-btn.active {
+  background: rgba(99,102,241,.28); border-color: #6366f1; color: #c7d2fe;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+}
+.pdfed-panel-sep { height: 1px; background: rgba(255,255,255,.07); margin: .3rem 0; flex-shrink: 0; }
+.pdfed-opt-row {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .22rem 0;
+}
+.pdfed-opt-row label { font-size: .75rem; color: #94a3b8; font-weight: 500; white-space: nowrap; }
+.pdfed-opt-row select,
+.pdfed-opt-row input[type="number"] {
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 6px; color: #fff; font-size: .78rem; font-family: inherit;
+  padding: .28rem .5rem; outline: none;
+}
+.pdfed-opt-row select         { flex: 1; max-width: 120px; }
+.pdfed-opt-row input[type="number"] { width: 58px; }
+.pdfed-opt-row select:focus,
+.pdfed-opt-row input:focus    { border-color: #6366f1; }
+
+.pdfed-style-btn {
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  color: #ccc; font-size: .82rem; width: 28px; height: 28px; border-radius: 6px;
+  cursor: pointer; font-family: serif; transition: all .17s;
+  display: flex; align-items: center; justify-content: center;
+}
+.pdfed-style-btn.active { background: rgba(99,102,241,.3); border-color: #6366f1; color: #a5b4fc; }
+.pdfed-style-btn:hover  { border-color: #6366f1; color: #fff; }
+
+.pdfed-color-swatch {
+  display: inline-block; width: 20px; height: 20px; border-radius: 50%;
+  cursor: pointer; border: 2px solid transparent; transition: all .17s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.pdfed-color-swatch:hover  { transform: scale(1.25); }
+.pdfed-color-swatch.active { border-color: #fff; transform: scale(1.15); }
+.pdfed-hl-swatch {
+  display: inline-block; width: 20px; height: 20px; border-radius: 4px;
+  cursor: pointer; border: 2px solid transparent; transition: all .17s;
+}
+.pdfed-hl-swatch:hover  { transform: scale(1.2); }
+.pdfed-hl-swatch.active { border-color: #fff; transform: scale(1.15); }
+
+/* Draw overlay preview */
+.pdfed-draw-overlay { position: absolute; pointer-events: none; z-index: 15; border-radius: 2px; }
+
+/* Edit-text overlays — show existing PDF text as editable regions */
+.pdfed-etxt-overlay {
+  position: absolute;
+  cursor: text;
+  border-radius: 2px;
+  transition: border-color .15s, background .15s;
+  box-sizing: border-box;
+}
+/* Hint bar shown at top of canvas when edit-text tool is active */
+.pdfed-etxt-hint {
+  background: rgba(99,102,241,.15);
+  border-bottom: 1px solid rgba(99,102,241,.3);
+  color: #a5b4fc;
+  font-size: .8rem;
+  padding: .5rem 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+  animation: pdfedFadeIn .2s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pdfed-thumb-panel { display: none; }
+  .pdfed-tools-panel { width: 200px; }
+  .pdfed-topbar { flex-wrap: wrap; }
+  .pdfed-filename { max-width: 160px; }
+}
+@media (max-width: 560px) {
+  .pdfed-tools-panel { display: none; }
+  .pdfed-topbar-right .pdfed-action-btn:not(.pdfed-save-btn):not(.pdfed-exit-btn) { display: none; }
+}
+
+
+
