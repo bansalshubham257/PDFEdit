@@ -105,6 +105,8 @@ except ImportError:
 
 # ---------- helpers ----------
 
+IS_PRODUCTION = os.environ.get('FLASK_ENV') == 'production'
+
 PIL_FORMAT_MAP = {
     'jpg': 'JPEG',
     'jpeg': 'JPEG',
