@@ -207,12 +207,12 @@
     <!-- ═══════════════════════════════════════
          PDF EDITOR SECTION
     ═══════════════════════════════════════ -->
-    <section id="pdf-editor" class="tool-section" style="padding:2rem 1rem 4rem;max-width:1400px;margin:0 auto">
+    <section id="pdf-editor" class="tool-section" style="padding:2rem 1rem 2rem;max-width:100%;margin:0 auto">
       <div class="section-header">
         <div class="section-icon">✏️</div>
         <div>
           <h2>PDF Editor</h2>
-          <p>Fill forms, type anywhere, add your signature on multiple pages — download the completed PDF instantly</p>
+          <p>Edit text, highlight, annotate, add images &amp; shapes — download the completed PDF instantly</p>
         </div>
       </div>
 
@@ -224,8 +224,6 @@
           <input type="file" id="pdfed-file" accept=".pdf,application/pdf" hidden />
         </div>
         <div id="pdfed-status" class="status-msg hidden"></div>
-
-        <!-- Password prompt — shown only for encrypted PDFs -->
         <div id="pdfed-password-row" style="display:none;margin-top:1rem;gap:0.5rem;align-items:center;flex-wrap:wrap">
           <span style="font-size:0.9rem">🔒 This PDF is password-protected:</span>
           <input type="password" id="pdfed-password" aria-label="PDF password" placeholder="Enter PDF password…"
@@ -234,36 +232,8 @@
         </div>
       </div>
 
-      <!-- Editor workspace — hidden until PDF loaded -->
-      <div id="pdfed-workspace" class="hidden">
-        <div id="pdfed-toolbar" style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;padding:0.75rem 1rem;background:var(--surface,#1e1e2e);border-radius:12px;margin-bottom:1rem;margin-top:1rem">
-          <strong style="font-size:0.9rem;color:var(--text-muted,#888)">Tool:</strong>
-          <button class="btn btn-sm pdfed-tool active" data-tool="text" id="pdfed-tool-text">📝 Add Text</button>
-          <button class="btn btn-sm pdfed-tool" data-tool="signature" id="pdfed-tool-sig">✍️ Add Signature</button>
-          <button class="btn btn-sm pdfed-tool" data-tool="checkbox" id="pdfed-tool-chk">☑️ Tick Checkbox</button>
-          <div style="display:flex;align-items:center;gap:0.4rem;margin-left:0.5rem">
-            <label for="pdfed-fontsize" style="font-size:0.8rem;color:var(--text-muted,#888)">Font size:</label>
-            <input type="number" id="pdfed-fontsize" value="14" min="6" max="72"
-              style="width:60px;padding:0.25rem 0.4rem;border-radius:6px;border:1px solid var(--border,#333);background:var(--bg,#141420);color:inherit" />
-          </div>
-          <div style="display:flex;align-items:center;gap:0.4rem">
-            <label for="pdfed-color" style="font-size:0.8rem;color:var(--text-muted,#888)">Color:</label>
-            <input type="color" id="pdfed-color" value="#000000"
-              style="width:36px;height:30px;border:none;cursor:pointer;background:transparent" />
-          </div>
-          <div style="margin-left:auto;display:flex;gap:0.5rem;flex-wrap:wrap">
-            <button class="btn btn-sm" id="pdfed-change-btn">📂 Change PDF</button>
-            <button class="btn btn-sm" id="pdfed-undo-btn">↩️ Undo</button>
-            <button class="btn btn-sm" id="pdfed-clear-btn">🗑️ Clear All</button>
-            <button class="btn btn-primary" id="pdfed-save-btn"><span class="btn-icon">⬇️</span> Download Filled PDF</button>
-          </div>
-        </div>
-        <div style="padding:0.3rem 0 0.75rem;color:var(--text-muted,#888);font-size:0.85rem">
-          <span id="pdfed-ann-count">0 annotations</span> &nbsp;·&nbsp;
-          Click anywhere on a page to place text or a signature
-        </div>
-        <div id="pdfed-pages" style="display:flex;flex-direction:column;gap:2rem;align-items:center"></div>
-      </div>
+      <!-- ═══ Full Editor Workspace ═══ -->
+      <!-- NOTE: actual workspace is a full-page overlay rendered at body level (id=pdfed-workspace) -->
     </section>
 
     <!-- ═══════════════════════════════════════
@@ -1840,6 +1810,143 @@
       }));
     }
   </script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PDF EDITOR — FULL-PAGE OVERLAY  (hidden until PDF loaded)
+══════════════════════════════════════════════════════════════ -->
+<div id="pdfed-workspace" class="pdfed-fullpage hidden" role="dialog" aria-modal="true" aria-label="PDF Editor">
+
+  <!-- ── TOP BAR ── -->
+  <div class="pdfed-topbar">
+    <div class="pdfed-topbar-left">
+      <div class="pdfed-logo-mark">✏️</div>
+      <span class="pdfed-filename" id="pdfed-filename">document.pdf</span>
+      <span class="pdfed-ann-badge"><span id="pdfed-ann-count">0</span> annotations</span>
+    </div>
+    <div class="pdfed-topbar-right">
+      <button class="pdfed-action-btn" id="pdfed-undo-btn" title="Undo (Ctrl+Z)">↩ Undo</button>
+      <button class="pdfed-action-btn" id="pdfed-clear-btn" title="Clear all annotations">🗑 Clear All</button>
+      <button class="pdfed-action-btn" id="pdfed-change-btn" title="Load a different PDF">📂 Change PDF</button>
+      <button class="pdfed-action-btn pdfed-save-btn" id="pdfed-save-btn">⬇ Download PDF</button>
+      <button class="pdfed-exit-btn" id="pdfed-exit-btn" title="Exit editor">✕ Exit</button>
+    </div>
+  </div>
+
+  <!-- ── 3-COLUMN BODY ── -->
+  <div class="pdfed-editor-layout">
+
+    <!-- LEFT: page thumbnails -->
+    <div class="pdfed-thumb-panel" id="pdfed-thumbs">
+      <div class="pdfed-panel-title">Pages</div>
+    </div>
+
+    <!-- MIDDLE: editing canvas -->
+    <div class="pdfed-canvas-panel" id="pdfed-canvas-panel">
+      <div id="pdfed-canvas-status" class="status-msg hidden" style="margin:1rem 2rem"></div>
+      <div id="pdfed-pages" style="display:flex;flex-direction:column;gap:2.5rem;align-items:center;padding:2rem 2rem 4rem"></div>
+    </div>
+
+    <!-- RIGHT: tools sidebar -->
+    <div class="pdfed-tools-panel">
+
+      <div class="pdfed-tool-group">
+        <div class="pdfed-tool-group-label">✏️ TEXT</div>
+        <button class="pdfed-tool-btn active" data-tool="text">📝 Add Text</button>
+        <button class="pdfed-tool-btn" data-tool="edittext">🖊 Edit / Remove Text</button>
+        <button class="pdfed-tool-btn" data-tool="note">💬 Sticky Note</button>
+      </div>
+
+      <div class="pdfed-tool-group">
+        <div class="pdfed-tool-group-label">🎨 MARK &amp; ERASE</div>
+        <button class="pdfed-tool-btn" data-tool="highlight">🟡 Highlight</button>
+        <button class="pdfed-tool-btn" data-tool="whiteout">⬜ Whiteout / Erase</button>
+      </div>
+
+      <div class="pdfed-tool-group">
+        <div class="pdfed-tool-group-label">⬛ SHAPES</div>
+        <button class="pdfed-tool-btn" data-tool="rect">▭ Rectangle</button>
+        <button class="pdfed-tool-btn" data-tool="ellipse">⭕ Ellipse</button>
+      </div>
+
+      <div class="pdfed-tool-group">
+        <div class="pdfed-tool-group-label">📎 INSERT</div>
+        <button class="pdfed-tool-btn" data-tool="image" id="pdfed-tool-image">🖼 Add Image</button>
+        <input type="file" id="pdfed-img-input" accept="image/*" hidden />
+        <button class="pdfed-tool-btn" data-tool="signature">✍ Signature</button>
+        <button class="pdfed-tool-btn" data-tool="checkbox">☑ Checkbox</button>
+      </div>
+
+      <div class="pdfed-panel-sep"></div>
+
+      <div class="pdfed-tool-group" id="pdfed-text-options">
+        <div class="pdfed-tool-group-label">🔤 FONT</div>
+        <div class="pdfed-opt-row">
+          <label>Family</label>
+          <select id="pdfed-fontfamily">
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Helvetica">Helvetica</option>
+          </select>
+        </div>
+        <div class="pdfed-opt-row">
+          <label>Size</label>
+          <input type="number" id="pdfed-fontsize" value="14" min="6" max="96" />
+        </div>
+        <div class="pdfed-opt-row">
+          <label>Style</label>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="pdfed-style-btn" id="pdfed-bold"><b>B</b></button>
+            <button class="pdfed-style-btn" id="pdfed-italic"><i>I</i></button>
+            <button class="pdfed-style-btn" id="pdfed-underline"><u>U</u></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pdfed-panel-sep"></div>
+
+      <div class="pdfed-tool-group">
+        <div class="pdfed-tool-group-label">🎨 COLOR</div>
+        <div class="pdfed-opt-row">
+          <label id="pdfed-color-label">Text Color</label>
+          <input type="color" id="pdfed-color" value="#000000" style="width:38px;height:30px;cursor:pointer;background:none;border:none;padding:0" />
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+          <span class="pdfed-color-swatch" style="background:#000000" data-color="#000000" title="Black"></span>
+          <span class="pdfed-color-swatch" style="background:#ef4444" data-color="#ef4444" title="Red"></span>
+          <span class="pdfed-color-swatch" style="background:#3b82f6" data-color="#3b82f6" title="Blue"></span>
+          <span class="pdfed-color-swatch" style="background:#22c55e" data-color="#22c55e" title="Green"></span>
+          <span class="pdfed-color-swatch" style="background:#f59e0b" data-color="#f59e0b" title="Orange"></span>
+          <span class="pdfed-color-swatch" style="background:#a855f7" data-color="#a855f7" title="Purple"></span>
+          <span class="pdfed-color-swatch" style="background:#ffffff;border:1px solid #555" data-color="#ffffff" title="White"></span>
+        </div>
+        <div id="pdfed-hl-colors" style="display:none;margin-top:10px">
+          <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:5px">Highlight Color</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <span class="pdfed-hl-swatch active" style="background:#fde68a" data-hlcolor="rgba(253,230,138,0.55)" title="Yellow"></span>
+            <span class="pdfed-hl-swatch" style="background:#bbf7d0" data-hlcolor="rgba(187,247,208,0.55)" title="Green"></span>
+            <span class="pdfed-hl-swatch" style="background:#bfdbfe" data-hlcolor="rgba(191,219,254,0.55)" title="Blue"></span>
+            <span class="pdfed-hl-swatch" style="background:#fecaca" data-hlcolor="rgba(254,202,202,0.55)" title="Pink"></span>
+            <span class="pdfed-hl-swatch" style="background:#e9d5ff" data-hlcolor="rgba(233,213,255,0.55)" title="Purple"></span>
+          </div>
+        </div>
+        <div class="pdfed-opt-row" style="margin-top:10px">
+          <label>Opacity <span id="pdfed-opacity-val">80%</span></label>
+          <input type="range" id="pdfed-opacity" min="10" max="100" value="80" style="width:100%" />
+        </div>
+        <div class="pdfed-opt-row" id="pdfed-stroke-row">
+          <label>Border Width</label>
+          <input type="number" id="pdfed-stroke-width" value="2" min="0" max="20" style="width:60px" />
+        </div>
+      </div>
+
+    </div><!-- end tools panel -->
+  </div><!-- end editor layout -->
+</div><!-- end pdfed-workspace overlay -->
+
 </body>
 </html>
 
