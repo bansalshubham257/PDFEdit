@@ -218,7 +218,7 @@
         <!-- Password prompt — shown only for encrypted PDFs -->
         <div id="pdfed-password-row" style="display:none;margin-top:1rem;gap:0.5rem;align-items:center;flex-wrap:wrap">
           <span style="font-size:0.9rem">🔒 This PDF is password-protected:</span>
-          <input type="password" id="pdfed-password" placeholder="Enter PDF password…"
+          <input type="password" id="pdfed-password" aria-label="PDF password" placeholder="Enter PDF password…"
             style="padding:0.35rem 0.6rem;border-radius:6px;border:1px solid var(--border,#444);background:var(--bg,#141420);color:inherit;font-size:0.9rem;flex:1;min-width:180px" />
           <button class="btn btn-primary btn-sm" id="pdfed-unlock-btn">🔓 Unlock &amp; Open</button>
         </div>
@@ -232,12 +232,12 @@
           <button class="btn btn-sm pdfed-tool" data-tool="signature" id="pdfed-tool-sig">✍️ Add Signature</button>
           <button class="btn btn-sm pdfed-tool" data-tool="checkbox" id="pdfed-tool-chk">☑️ Tick Checkbox</button>
           <div style="display:flex;align-items:center;gap:0.4rem;margin-left:0.5rem">
-            <label style="font-size:0.8rem;color:var(--text-muted,#888)">Font size:</label>
+            <label for="pdfed-fontsize" style="font-size:0.8rem;color:var(--text-muted,#888)">Font size:</label>
             <input type="number" id="pdfed-fontsize" value="14" min="6" max="72"
               style="width:60px;padding:0.25rem 0.4rem;border-radius:6px;border:1px solid var(--border,#333);background:var(--bg,#141420);color:inherit" />
           </div>
           <div style="display:flex;align-items:center;gap:0.4rem">
-            <label style="font-size:0.8rem;color:var(--text-muted,#888)">Color:</label>
+            <label for="pdfed-color" style="font-size:0.8rem;color:var(--text-muted,#888)">Color:</label>
             <input type="color" id="pdfed-color" value="#000000"
               style="width:36px;height:30px;border:none;cursor:pointer;background:transparent" />
           </div>
@@ -347,14 +347,14 @@
 
         <div class="form-row" id="compress-kb-row" style="display:none">
           <div class="form-group">
-            <label>Target size (KB)</label>
+            <label for="compress-kb">Target size (KB)</label>
             <input type="number" id="compress-kb" placeholder="e.g. 50" min="5" max="10000" />
           </div>
         </div>
 
         <div class="form-row" id="compress-quality-row">
           <div class="form-group">
-            <label>Quality: <strong id="quality-val">80</strong>%</label>
+            <label for="compress-quality">Quality: <strong id="quality-val">80</strong>%</label>
             <input type="range" id="compress-quality" min="10" max="95" value="80" class="range-input" />
           </div>
         </div>
@@ -398,11 +398,11 @@
         <div class="tab-content active" id="tab-dimensions">
           <div class="form-row two-col">
             <div class="form-group">
-              <label>Width (px)</label>
+              <label for="resize-width">Width (px)</label>
               <input type="number" id="resize-width" placeholder="e.g. 1920" min="1" />
             </div>
             <div class="form-group">
-              <label>Height (px)</label>
+              <label for="resize-height">Height (px)</label>
               <input type="number" id="resize-height" placeholder="e.g. 1080" min="1" />
             </div>
           </div>
@@ -416,7 +416,7 @@
         <div class="tab-content hidden" id="tab-percentage">
           <div class="form-row">
             <div class="form-group">
-              <label>Scale: <strong id="pct-val">50</strong>%</label>
+              <label for="resize-pct">Scale: <strong id="pct-val">50</strong>%</label>
               <input type="range" id="resize-pct" min="5" max="200" value="50" class="range-input" />
             </div>
           </div>
@@ -632,23 +632,23 @@
           <div class="etab-content active" id="etab-adjustments">
             <div class="slider-grid">
               <div class="form-group">
-                <label>☀️ Brightness <strong id="val-brightness">1.0</strong> <button class="sl-reset" data-for="sl-brightness" data-default="1.0" title="Reset">↺</button></label>
+                <label for="sl-brightness">☀️ Brightness <strong id="val-brightness">1.0</strong> <button class="sl-reset" data-for="sl-brightness" data-default="1.0" title="Reset">↺</button></label>
                 <input type="range" class="range-input edit-slider" id="sl-brightness" min="0.1" max="3.0" step="0.05" value="1.0" data-css="brightness" />
               </div>
               <div class="form-group">
-                <label>🌗 Contrast <strong id="val-contrast">1.0</strong> <button class="sl-reset" data-for="sl-contrast" data-default="1.0" title="Reset">↺</button></label>
+                <label for="sl-contrast">🌗 Contrast <strong id="val-contrast">1.0</strong> <button class="sl-reset" data-for="sl-contrast" data-default="1.0" title="Reset">↺</button></label>
                 <input type="range" class="range-input edit-slider" id="sl-contrast" min="0.1" max="3.0" step="0.05" value="1.0" data-css="contrast" />
               </div>
               <div class="form-group">
-                <label>🎨 Saturation <strong id="val-saturation">1.0</strong> <button class="sl-reset" data-for="sl-saturation" data-default="1.0" title="Reset">↺</button></label>
+                <label for="sl-saturation">🎨 Saturation <strong id="val-saturation">1.0</strong> <button class="sl-reset" data-for="sl-saturation" data-default="1.0" title="Reset">↺</button></label>
                 <input type="range" class="range-input edit-slider" id="sl-saturation" min="0.0" max="3.0" step="0.05" value="1.0" data-css="saturate" />
               </div>
               <div class="form-group">
-                <label>🔪 Sharpness <strong id="val-sharpness">1.0</strong> <button class="sl-reset" data-for="sl-sharpness" data-default="1.0" title="Reset">↺</button></label>
+                <label for="sl-sharpness">🔪 Sharpness <strong id="val-sharpness">1.0</strong> <button class="sl-reset" data-for="sl-sharpness" data-default="1.0" title="Reset">↺</button></label>
                 <input type="range" class="range-input edit-slider" id="sl-sharpness" min="0.0" max="5.0" step="0.1" value="1.0" data-css="none" />
               </div>
               <div class="form-group">
-                <label>💫 Blur <strong id="val-blur">0</strong>px <button class="sl-reset" data-for="sl-blur" data-default="0" title="Reset">↺</button></label>
+                <label for="sl-blur">💫 Blur <strong id="val-blur">0</strong>px <button class="sl-reset" data-for="sl-blur" data-default="0" title="Reset">↺</button></label>
                 <input type="range" class="range-input edit-slider" id="sl-blur" min="0" max="20" step="0.5" value="0" data-css="blur" />
               </div>
             </div>
@@ -720,21 +720,21 @@
             </div>
             <div class="form-row two-col">
               <div class="form-group">
-                <label>Watermark / Text</label>
+                <label for="wm-text">Watermark / Text</label>
                 <input type="text" id="wm-text" placeholder="© YourName 2025" value="© ImageKit" />
               </div>
               <div class="form-group">
-                <label>Font Size</label>
+                <label for="wm-size">Font Size</label>
                 <input type="number" id="wm-size" value="40" min="10" max="200" />
               </div>
             </div>
             <div class="form-row two-col">
               <div class="form-group">
-                <label>Text Color</label>
+                <label for="wm-color">Text Color</label>
                 <input type="color" id="wm-color" value="#ffffff" class="color-input" />
               </div>
               <div class="form-group">
-                <label>Opacity: <strong id="wm-opacity-val">70</strong>%</label>
+                <label for="wm-opacity">Opacity: <strong id="wm-opacity-val">70</strong>%</label>
                 <input type="range" class="range-input" id="wm-opacity" min="10" max="100" value="70" />
               </div>
             </div>
@@ -805,17 +805,17 @@
           <!-- Controls -->
           <div class="form-row">
             <div class="form-group">
-              <label>Text</label>
+              <label for="at-text">Text</label>
               <input type="text" id="at-text" placeholder="Your text here…" value="Hello World" />
             </div>
           </div>
           <div class="slider-grid">
             <div class="form-group">
-              <label>Font Size <strong id="at-size-val">60</strong>px</label>
+              <label for="at-size">Font Size <strong id="at-size-val">60</strong>px</label>
               <input type="range" class="range-input" id="at-size" min="10" max="300" value="60" />
             </div>
             <div class="form-group">
-              <label>Text Color</label>
+              <label for="at-color">Text Color</label>
               <input type="color" id="at-color" value="#ffffff" class="color-input" />
             </div>
           </div>
@@ -827,11 +827,11 @@
           </div>
           <div id="at-bgbox-controls" class="form-row two-col hidden">
             <div class="form-group">
-              <label>Box Color</label>
+              <label for="at-bg-color">Box Color</label>
               <input type="color" id="at-bg-color" value="#000000" class="color-input" />
             </div>
             <div class="form-group">
-              <label>Box Opacity <strong id="at-bg-opacity-val">60</strong>%</label>
+              <label for="at-bg-opacity">Box Opacity <strong id="at-bg-opacity-val">60</strong>%</label>
               <input type="range" class="range-input" id="at-bg-opacity" min="10" max="100" value="60" />
             </div>
           </div>
@@ -888,7 +888,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Background Color</label>
+              <label for="pp-bg">Background Color</label>
               <div style="display:flex;gap:0.5rem;align-items:center">
                 <input type="color" id="pp-bg" value="#ffffff" class="color-input" style="flex:1" />
                 <button class="action-btn" id="pp-bg-white">White</button>
@@ -981,11 +981,11 @@
             </div>
             <div id="sig-custom-row" class="form-row two-col hidden">
               <div class="form-group">
-                <label>Width (px)</label>
+                <label for="sig-w">Width (px)</label>
                 <input type="number" id="sig-w" value="140" min="10" />
               </div>
               <div class="form-group">
-                <label>Height (px)</label>
+                <label for="sig-h">Height (px)</label>
                 <input type="number" id="sig-h" value="60" min="10" />
               </div>
             </div>
@@ -1149,7 +1149,7 @@
               </div>
             </div>
             <div class="form-group" style="margin-bottom:1rem">
-              <label>Pages (leave blank for all)</label>
+              <label for="p2i-pages">Pages (leave blank for all)</label>
               <input type="text" id="p2i-pages" placeholder="e.g. 1-3 or 1,3,5 or leave blank for all" />
             </div>
             <button class="btn btn-primary" id="p2i-btn" disabled><span class="btn-icon">📸</span> Convert to Images</button>
@@ -1210,11 +1210,11 @@
               </select>
             </div>
             <div class="form-group hidden" id="split-range-row" style="margin-bottom:1rem">
-              <label>Page Ranges (comma-separated)</label>
+              <label for="split-ranges">Page Ranges (comma-separated)</label>
               <input type="text" id="split-ranges" placeholder="e.g. 1-3,4-6,7-10" />
             </div>
             <div class="form-group hidden" id="split-n-row" style="margin-bottom:1rem">
-              <label>Pages per part</label>
+              <label for="split-n">Pages per part</label>
               <input type="number" id="split-n" value="1" min="1" />
             </div>
             <button class="btn btn-primary" id="split-btn" disabled><span class="btn-icon">✂️</span> Split PDF</button>
@@ -1230,7 +1230,7 @@
             </div>
             <div id="del-info" class="pdf-info-bar hidden"></div>
             <div class="form-group" style="margin-bottom:1rem">
-              <label>Pages to delete <span class="sub-label">(1-indexed, e.g. 1,3,5-7)</span></label>
+              <label for="del-pages">Pages to delete <span class="sub-label">(1-indexed, e.g. 1,3,5-7)</span></label>
               <input type="text" id="del-pages" placeholder="e.g. 2,4-6,9" />
             </div>
             <button class="btn btn-primary" id="del-btn" disabled><span class="btn-icon">🗑️</span> Delete Pages</button>
@@ -1246,7 +1246,7 @@
             </div>
             <div id="rear-info" class="pdf-info-bar hidden"></div>
             <div class="form-group" style="margin-bottom:1rem">
-              <label>New page order <span class="sub-label">(comma-separated, e.g. 3,1,2,4)</span></label>
+              <label for="rear-order">New page order <span class="sub-label">(comma-separated, e.g. 3,1,2,4)</span></label>
               <input type="text" id="rear-order" placeholder="e.g. 3,1,2,4,5" />
             </div>
             <button class="btn btn-primary" id="rear-btn" disabled><span class="btn-icon">🔀</span> Rearrange Pages</button>
@@ -1832,3 +1832,6 @@
   </script>
 </body>
 </html>
+
+
+
