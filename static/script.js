@@ -586,7 +586,10 @@ document.querySelectorAll('.pos-btn').forEach(btn => {
 // ── Canvas watermark live preview ──
 const _wmCanvas = document.getElementById('wm-canvas');
 if (_wmCanvas) {
-  new ResizeObserver(entries => { _wmContainerW = entries[0].contentRect.width; }).observe(_wmCanvas.parentElement);
+  new ResizeObserver(entries => {
+    const w = entries[0].contentRect.width;
+    if (w) _wmContainerW = w;
+  }).observe(_wmCanvas.parentElement);
 }
 
 function updateWatermarkPreview() {
@@ -729,7 +732,8 @@ const atCtx       = atCanvas?.getContext('2d');
 
 if (atCanvas) {
   new ResizeObserver(entries => {
-    _atContainerW = entries[0].contentRect.width;
+    const w = entries[0].contentRect.width;
+    if (w) _atContainerW = w;
   }).observe(atCanvas.parentElement);
 }
 
@@ -972,7 +976,9 @@ let _sigPadContainerW = 0; // cached — no reflow in initSigPad
 
 if (sigPadCanvas) {
   new ResizeObserver(entries => {
-    _sigPadContainerW = entries[0].contentRect.width;
+    const w = entries[0].contentRect.width;
+    if (!w) return; // element hidden — skip, avoid forced reflow at page load
+    _sigPadContainerW = w;
     initSigPad(); // re-init on resize
   }).observe(sigPadCanvas.parentElement);
 }
