@@ -43,10 +43,22 @@
    "featureList":"Fill PDF form online, Edit PDF online, Sign PDF, Merge PDF, Compress PDF, PDF Form Filler, Add text to PDF, PDF Annotator"}
   </script>
 
+  <!-- Preconnects -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ static_ver }}" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+
+  <!-- Google Fonts — non-blocking -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" /></noscript>
+
+  <!-- Main stylesheet — preload for faster delivery -->
+  <link rel="preload" as="style" href="{{ url_for('static', filename='style.css') }}?v={{ static_ver }}" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ static_ver }}" /></noscript>
+
+  <!-- Cropper.css — non-blocking (only needed for crop tool) -->
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" /></noscript>
   <style>
     /* ── Mobile nav ── */
     .nav-toggle{display:none;background:none;border:none;color:#f1f5f9;font-size:1.5rem;cursor:pointer;padding:.25rem .5rem;margin-left:auto}
@@ -1798,8 +1810,8 @@
   </footer>
 
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-  <script src="{{ url_for('static', filename='script.js') }}?v={{ static_ver }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js" defer></script>
+  <script src="{{ url_for('static', filename='script.js') }}?v={{ static_ver }}" defer></script>
   <script>
     // Mobile hamburger
     const _nt = document.getElementById('nav-toggle');
@@ -1820,6 +1832,3 @@
   </script>
 </body>
 </html>
-
-
-
