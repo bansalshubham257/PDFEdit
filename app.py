@@ -64,7 +64,7 @@ except Exception:
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB upload limit
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'imgtools-secret')
-app.config['SITE_URL']   = os.environ.get('SITE_URL', 'https://pixeldocs.io')
+app.config['SITE_URL']   = os.environ.get('SITE_URL', 'https://editpdfform.com')
 
 import time as _time
 _STATIC_VER = os.environ.get('STATIC_VERSION', str(int(_time.time())))
