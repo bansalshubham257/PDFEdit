@@ -1,6 +1,15 @@
-/* ── ImageKit — script.js ── */
+/* ── Utilities ──────────────────────────────────────────
+ * rafThrottle(fn) — wraps fn so it runs at most once per animation frame.
+ * Prevents forced reflow when fn reads layout after a style write.
+ */
+function rafThrottle(fn) {
+  let raf = null;
+  return function(...args) {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = null; fn.apply(this, args); });
+  };
+}
 
-// ── Utilities ──────────────────────────────────────────
 function fmt(bytes) {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
@@ -406,8 +415,9 @@ function triggerDownload(blob, filename) {
 // TOOL 7 — EDIT & EFFECTS
 // ══════════════════════════════════════════════════════
 let editFile   = null;
-let activeEffect = 'none';   // single active effect name
+let activeEffect = 'none';
 let wmPosition = 'bottom-right';
+let _wmContainerW = 0; // cached container width — no reflow on redraw
 
 // CSS filter strings per effect (for live preview)
 const FX_CSS = {
@@ -483,7 +493,8 @@ function updateLivePreview() {
   editLiveImg.style.filter = filter;
 }
 
-// ── Slider value display + live preview ──
+// ── Slider value display + live preview — rAF-throttled ──
+const _throttledLivePreview = rafThrottle(() => updateLivePreview());
 document.querySelectorAll('.edit-slider').forEach(slider => {
   const id   = slider.id.replace('sl-', '');
   const disp = document.getElementById('val-' + id);
@@ -492,7 +503,7 @@ document.querySelectorAll('.edit-slider').forEach(slider => {
       const v = parseFloat(slider.value);
       disp.textContent = Number.isInteger(v) ? v : v.toFixed(1);
     }
-    updateLivePreview();
+    _throttledLivePreview();
   });
 });
 
@@ -551,17 +562,17 @@ function resetEffects() {
 }
 document.getElementById('reset-effects-btn').addEventListener('click', resetEffects);
 
-// ── Watermark controls ──
+// ── Watermark controls — rAF-throttled to prevent reflow on rapid slider drag ──
+const _throttledWmPreview = rafThrottle(() => updateWatermarkPreview());
 document.getElementById('wm-opacity').addEventListener('input', function () {
   document.getElementById('wm-opacity-val').textContent = this.value;
-  updateWatermarkPreview();
+  _throttledWmPreview();
 });
 
-// Live preview on every watermark input change
 ['wm-text', 'wm-size', 'wm-color'].forEach(id => {
-  document.getElementById(id).addEventListener('input', updateWatermarkPreview);
+  document.getElementById(id).addEventListener('input', _throttledWmPreview);
 });
-document.getElementById('wm-repeat').addEventListener('change', updateWatermarkPreview);
+document.getElementById('wm-repeat').addEventListener('change', _throttledWmPreview);
 
 document.querySelectorAll('.pos-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -573,17 +584,21 @@ document.querySelectorAll('.pos-btn').forEach(btn => {
 });
 
 // ── Canvas watermark live preview ──
+const _wmCanvas = document.getElementById('wm-canvas');
+if (_wmCanvas) {
+  new ResizeObserver(entries => { _wmContainerW = entries[0].contentRect.width; }).observe(_wmCanvas.parentElement);
+}
+
 function updateWatermarkPreview() {
   if (!editFile) return;
   const canvas = document.getElementById('wm-canvas');
   const ctx    = canvas.getContext('2d');
   const src    = editLiveImg.src;
-  if (!src || src === window.location.href) return; // no image yet
+  if (!src || src === window.location.href) return;
 
   const img = new Image();
   img.onload = () => {
-    // Scale to fit preview box (max 480 wide, 300 tall)
-    const maxW  = Math.min(canvas.parentElement.clientWidth - 4, 720);
+    const maxW  = Math.min((_wmContainerW || canvas.parentElement.clientWidth) - 4, 720);
     const maxH  = 300;
     const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
     canvas.width  = Math.round(img.naturalWidth  * scale);
@@ -704,12 +719,19 @@ let atFile = null;
 let atImg  = new Image();
 let atX = 50, atY = 50;   // percent
 let atStyles = { bold: true, italic: false, shadow: false, bgbox: false };
+let _atContainerW = 0;  // cached — updated by ResizeObserver, no reflow on redraw
 
 const atDrop      = document.getElementById('at-drop');
 const atInput     = document.getElementById('at-file');
 const atWorkspace = document.getElementById('at-workspace');
 const atCanvas    = document.getElementById('at-canvas');
-const atCtx       = atCanvas.getContext('2d');
+const atCtx       = atCanvas?.getContext('2d');
+
+if (atCanvas) {
+  new ResizeObserver(entries => {
+    _atContainerW = entries[0].contentRect.width;
+  }).observe(atCanvas.parentElement);
+}
 
 setupDrop(atDrop, atInput, files => {
   atFile = files[0];
@@ -753,7 +775,7 @@ document.getElementById('at-reset-btn').addEventListener('click', () => {
 
 function drawAtCanvas() {
   if (!atImg.naturalWidth) return;
-  const maxW = Math.min(atCanvas.parentElement.clientWidth - 4, 800);
+  const maxW = Math.min((_atContainerW || atCanvas.parentElement.clientWidth) - 4, 800);
   const maxH = 360;
   const sc   = Math.min(maxW / atImg.naturalWidth, maxH / atImg.naturalHeight, 1);
   atCanvas.width  = Math.round(atImg.naturalWidth  * sc);
@@ -812,24 +834,25 @@ function drawAtCanvas() {
 }
 
 // Click on canvas to reposition text
-atCanvas.addEventListener('click', e => {
+atCanvas?.addEventListener('click', e => {
   const rect = atCanvas.getBoundingClientRect();
   atX = ((e.clientX - rect.left) / rect.width)  * 100;
   atY = ((e.clientY - rect.top)  / rect.height) * 100;
   drawAtCanvas();
 });
 
-// Redraw on any control change
+// Redraw on any control change — rAF-throttled to prevent reflow on rapid slider drag
+const _throttledDrawAt = rafThrottle(() => drawAtCanvas());
 ['at-text', 'at-color', 'at-bg-color'].forEach(id => {
-  document.getElementById(id).addEventListener('input', drawAtCanvas);
+  document.getElementById(id)?.addEventListener('input', _throttledDrawAt);
 });
-document.getElementById('at-size').addEventListener('input', function () {
+document.getElementById('at-size')?.addEventListener('input', function () {
   document.getElementById('at-size-val').textContent = this.value;
-  drawAtCanvas();
+  _throttledDrawAt();
 });
-document.getElementById('at-bg-opacity').addEventListener('input', function () {
+document.getElementById('at-bg-opacity')?.addEventListener('input', function () {
   document.getElementById('at-bg-opacity-val').textContent = this.value;
-  drawAtCanvas();
+  _throttledDrawAt();
 });
 
 // Style toggle buttons
@@ -936,21 +959,29 @@ setupDrop(document.getElementById('sig-drop'), document.getElementById('sig-file
 
 // ── Draw mode — Signature Pad ──
 const sigPadCanvas  = document.getElementById('sig-pad-canvas');
-const sigPadCtx     = sigPadCanvas.getContext('2d');
+const sigPadCtx     = sigPadCanvas?.getContext('2d');
 const sigPadHint    = document.getElementById('sig-pad-hint');
 const sigDownloadRawBtn = document.getElementById('sig-download-raw-btn');
 
 let sigPadDrawing   = false;
 let sigPadColor     = '#000000';
-let sigPadThickness = 2;       // CSS-pixel pen thickness
-let sigStrokes      = [];      // per-stroke DataURL snapshots for undo
+let sigPadThickness = 2;
+let sigStrokes      = [];
 let sigHasDrawn     = false;
+let _sigPadContainerW = 0; // cached — no reflow in initSigPad
+
+if (sigPadCanvas) {
+  new ResizeObserver(entries => {
+    _sigPadContainerW = entries[0].contentRect.width;
+    initSigPad(); // re-init on resize
+  }).observe(sigPadCanvas.parentElement);
+}
 
 // ── High-res init: canvas internal size = 3× display size ──
 function initSigPad() {
-  const displayW = sigPadCanvas.parentElement.clientWidth || 600;
+  const displayW = (_sigPadContainerW || sigPadCanvas.parentElement.clientWidth) || 600;
   const displayH = Math.max(160, Math.round(displayW * 0.28));
-  const DPR      = 3;                           // 3× for crisp download quality
+  const DPR      = 3;
   const physW    = Math.round(displayW * DPR);
   const physH    = Math.round(displayH * DPR);
 
@@ -1917,6 +1948,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   let annotations = [];
   let activeTool  = 'text';
   let pendingClick = null;
+  const _pageDims = new WeakMap(); // cache {pw, ph} per page wrapper — avoids offsetWidth/Height reflow
 
   // ── tool selection ──
   document.querySelectorAll('.pdfed-tool').forEach(btn => {
@@ -2034,6 +2066,11 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       wrapper.appendChild(img);
       wrapper.appendChild(label);
 
+      // Cache page dimensions once after image loads — avoids offsetWidth/offsetHeight reflow on every widget placement
+      img.addEventListener('load', () => {
+        _pageDims.set(wrapper, { pw: wrapper.offsetWidth, ph: img.offsetHeight });
+      }, { once: true });
+
       wrapper.addEventListener('click', e => {
         if (e.target.closest('.pdfed-ann-widget')) return;
         const rect  = img.getBoundingClientRect();
@@ -2049,6 +2086,13 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     if      (activeTool === 'text')      placeTextWidget(pageIndex, x_pct, y_pct, '', wrapper, img);
     else if (activeTool === 'signature') { pendingClick = { pageIndex, x_pct, y_pct }; openSigModal(); }
     else if (activeTool === 'checkbox')  placeCheckboxWidget(pageIndex, x_pct, y_pct, true, wrapper, img);
+  }
+
+  // Returns cached page dimensions, falling back to live read (and caching the result)
+  function getPageDims(wrapper, img) {
+    let d = _pageDims.get(wrapper);
+    if (!d) { d = { pw: wrapper.offsetWidth, ph: img.offsetHeight }; _pageDims.set(wrapper, d); }
+    return d;
   }
 
   // ════════════════════════════════════════
@@ -2136,7 +2180,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   function placeTextWidget(pageIndex, x_pct, y_pct, initialText, wrapper, img, annIndex) {
     const fontSize = parseInt(document.getElementById('pdfed-fontsize').value) || 14;
     const color    = document.getElementById('pdfed-color').value;
-    const pw = wrapper.offsetWidth, ph = img.offsetHeight;
+    const { pw, ph } = getPageDims(wrapper, img);
 
     const widget = document.createElement('div');
     widget.className = 'pdfed-ann-widget';
@@ -2189,7 +2233,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   // ════════════════════════════════════════
   function placeSignatureWidget(pageIndex, x_pct, y_pct, imgData, wrapper) {
     const img = wrapper.querySelector('img');
-    const pw = wrapper.offsetWidth, ph = img.offsetHeight;
+    const { pw, ph } = getPageDims(wrapper, img);
     const initW = Math.round(pw * 0.25);
 
     const widget = document.createElement('div');
@@ -2230,7 +2274,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   // CHECKBOX WIDGET
   // ════════════════════════════════════════
   function placeCheckboxWidget(pageIndex, x_pct, y_pct, checked, wrapper, img, annIndex) {
-    const pw = wrapper.offsetWidth, ph = img.offsetHeight;
+    const { pw, ph } = getPageDims(wrapper, img);
     const initSize = (annIndex !== undefined && annotations[annIndex]?.size) ? annotations[annIndex].size : 22;
 
     const widget = document.createElement('div');
@@ -2279,7 +2323,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   // ── build helpers for redraw ──
   function buildSigWidget(ann, annIndex, pageWrapper) {
     const img = pageWrapper.querySelector('img');
-    const pw = pageWrapper.offsetWidth, ph = img.offsetHeight;
+    const { pw, ph } = getPageDims(pageWrapper, img);
     const curW = Math.round(ann.width_pct * pw) || Math.round(pw * 0.25);
 
     const widget = document.createElement('div');
@@ -2312,7 +2356,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
 
   function buildCheckboxWidget(ann, annIndex, pageWrapper) {
     const img = pageWrapper.querySelector('img');
-    const pw = pageWrapper.offsetWidth, ph = img.offsetHeight;
+    const { pw, ph } = getPageDims(pageWrapper, img);
     const boxSize = ann.size || 22;
 
     const widget = document.createElement('div');
