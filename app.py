@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, send_file
+from flask_compress import Compress
 import os, io, logging, sys, uuid, tempfile, zipfile
 from PIL import Image, ImageFilter, ImageEnhance, ImageDraw, ImageFont, ImageOps
 
@@ -65,6 +66,30 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB upload limit
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'imgtools-secret')
 app.config['SITE_URL']   = os.environ.get('SITE_URL', 'https://editpdfform.com')
+
+# ── Compression (gzip/brotli) ──────────────────────────────────────────────
+app.config['COMPRESS_REGISTER'] = True
+app.config['COMPRESS_LEVEL']    = 6          # gzip level (1-9), 6 is good balance
+app.config['COMPRESS_MIN_SIZE'] = 500        # only compress responses > 500 bytes
+app.config['COMPRESS_MIMETYPES'] = [
+    'text/html', 'text/css', 'text/javascript',
+    'application/javascript', 'application/json',
+    'application/xml', 'text/xml', 'text/plain',
+    'image/svg+xml',
+]
+Compress(app)
+
+# ── Cache-Control for static assets ───────────────────────────────────────
+@app.after_request
+def set_response_headers(response):
+    path = request.path
+    # Long-lived cache for versioned static files (CSS/JS have ?v= cache-bust)
+    if path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    # Short cache for HTML pages
+    elif path in ('/', ) or path.startswith('/fill-pdf') or path.startswith('/edit-pdf') or path.startswith('/sign-pdf'):
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+    return response
 
 import time as _time
 _STATIC_VER = os.environ.get('STATIC_VERSION', str(int(_time.time())))
