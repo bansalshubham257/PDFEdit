@@ -14,6 +14,7 @@ function showStatus(el, type, msg) {
 }
 
 function setupDrop(zone, input, onFiles) {
+  if (!zone || !input) return;
   zone.addEventListener('click', e => {
     // Label click already opens the dialog natively — don't double-trigger
     if (e.target.tagName === 'LABEL' || e.target === input) return;
@@ -1073,7 +1074,7 @@ document.getElementById('sig-undo-btn').addEventListener('click', () => {
 });
 
 // Clear
-document.getElementById('sig-clear-btn').addEventListener('click', () => {
+document.getElementById('india-sig-clear-btn').addEventListener('click', () => {
   sigPadCtx.fillStyle = '#ffffff';
   sigPadCtx.fillRect(0, 0, sigPadCanvas.width, sigPadCanvas.height);
   sigStrokes   = [];
@@ -1734,7 +1735,7 @@ setupDrop(document.getElementById('ds-garment-drop'), document.getElementById('d
   updateDsBtn();
 });
 
-document.getElementById('ds-btn').addEventListener('click', async () => {
+document.getElementById('ds-btn')?.addEventListener('click', async () => {
   if (!dsPersonFile || !dsGarmentFile) return;
 
   const btn    = document.getElementById('ds-btn');
@@ -1907,6 +1908,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
    PDF EDITOR
 ═══════════════════════════════════════════════════════════════ */
 (function () {
+  try {
   let pdfedFile   = null;
   let pdfedPages  = [];
   let annotations = [];
@@ -1940,8 +1942,10 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     input.addEventListener('change', () => { if (input.files[0]) handlePdfEditorFile(input.files[0]); });
   }
   setupPdfDrop('pdfed-drop', 'pdfed-file');
+  console.log('[PDF Editor] initialized, drop zone ready');
 
   async function handlePdfEditorFile(file) {
+    console.log('[PDF Editor] file selected:', file?.name);
     if (!file.name.toLowerCase().endsWith('.pdf')) {
       showPdfEdStatus('error', '❌ Please upload a PDF file'); return;
     }
@@ -1949,10 +1953,13 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     annotations = [];
     document.getElementById('pdfed-password-row').style.display = 'none';
     document.getElementById('pdfed-password').value = '';
+    document.getElementById('pdfed-upload-card').style.display = '';
+    document.getElementById('pdfed-workspace').classList.add('hidden');
     await loadPdfPreview('');
   }
 
   async function loadPdfPreview(password) {
+    console.log('[PDF Editor] calling /api/pdf-editor/preview');
     showPdfEdStatus('info', '⏳ Loading PDF pages…');
     const fd = new FormData();
     fd.append('file', pdfedFile);
@@ -1960,6 +1967,7 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     try {
       const res  = await fetch('/api/pdf-editor/preview', { method: 'POST', body: fd });
       const data = await res.json();
+      console.log('[PDF Editor] preview response:', res.status, data.page_count ?? data.error ?? data);
 
       if (data.needs_password) {
         // Show password input
@@ -1972,7 +1980,11 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
       document.getElementById('pdfed-password-row').style.display = 'none';
       pdfedPages = data.pages;
       renderPages();
-      document.getElementById('pdfed-workspace').classList.remove('hidden');
+      // Hide upload card, show workspace, scroll into view
+      document.getElementById('pdfed-upload-card').style.display = 'none';
+      const ws = document.getElementById('pdfed-workspace');
+      ws.classList.remove('hidden');
+      ws.scrollIntoView({ behavior: 'smooth', block: 'start' });
       showPdfEdStatus('success', `✅ Loaded ${data.page_count} page(s) — click anywhere to annotate`);
     } catch (e) { showPdfEdStatus('error', '❌ ' + e.message); }
   }
@@ -2344,6 +2356,18 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
     if (el) el.textContent = annotations.length + ' annotation' + (annotations.length !== 1 ? 's' : '');
   }
 
+  // ── change PDF ──
+  document.getElementById('pdfed-change-btn').addEventListener('click', () => {
+    pdfedFile = null;
+    pdfedPages = [];
+    annotations = [];
+    document.getElementById('pdfed-workspace').classList.add('hidden');
+    document.getElementById('pdfed-upload-card').style.display = '';
+    document.getElementById('pdfed-status').classList.add('hidden');
+    document.getElementById('pdfed-file').value = '';
+    document.getElementById('pdfed-upload-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   // ── undo / clear ──
   document.getElementById('pdfed-undo-btn').addEventListener('click', () => {
     if (!annotations.length) return;
@@ -2427,6 +2451,6 @@ document.getElementById('cbg-btn').addEventListener('click', async () => {
   sigCanvas.addEventListener('touchmove',  e => { e.preventDefault(); sigDraw(e); }, { passive: false });
   sigCanvas.addEventListener('touchend',   () => sigDrawing = false);
 
+  } catch(e) { console.error('[PDF Editor] init error:', e); }
 })(); // end PDF Editor IIFE
-
 
