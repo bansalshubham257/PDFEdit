@@ -294,7 +294,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Output Format</label>
+            <label for="convert-format">Output Format</label>
             <select id="convert-format">
               <option value="png">PNG</option>
               <option value="jpg">JPG / JPEG</option>
@@ -877,7 +877,7 @@
           <div id="pp-preview" class="preview-box hidden"></div>
           <div class="form-row two-col">
             <div class="form-group">
-              <label>Photo Size</label>
+              <label for="pp-size">Photo Size</label>
               <select id="pp-size">
                 <option value="35x45mm">35×45mm — India Passport / Visa ✅</option>
                 <option value="51x51mm">51×51mm — US Passport</option>
@@ -1053,7 +1053,7 @@
           </div>
           <div class="form-row" style="margin-top:1rem">
             <div class="form-group">
-              <label>Layout</label>
+              <label for="merge-layout">Layout</label>
               <select id="merge-layout">
                 <option value="form">📄 Govt Form Layout (Photo right, Signature left)</option>
                 <option value="side-by-side">↔ Side by Side</option>
@@ -1132,14 +1132,14 @@
             <div id="p2i-info" class="pdf-info-bar hidden"></div>
             <div class="form-row two-col">
               <div class="form-group">
-                <label>Output Format</label>
+                <label for="p2i-fmt">Output Format</label>
                 <select id="p2i-fmt">
                   <option value="jpg">JPG (smaller size)</option>
                   <option value="png">PNG (best quality)</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Resolution (DPI)</label>
+                <label for="p2i-dpi">Resolution (DPI)</label>
                 <select id="p2i-dpi">
                   <option value="96">96 DPI — Screen</option>
                   <option value="150" selected>150 DPI — Standard</option>
@@ -1202,7 +1202,7 @@
             </div>
             <div id="split-info" class="pdf-info-bar hidden"></div>
             <div class="form-group" style="margin-bottom:1rem">
-              <label>Split Method</label>
+              <label for="split-type">Split Method</label>
               <select id="split-type">
                 <option value="each">Every page into separate PDF</option>
                 <option value="range">By page ranges (e.g. 1-3, 4-6)</option>
@@ -1271,7 +1271,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>Pages to rotate</label>
+                <label for="rpdf-pages">Pages to rotate</label>
                 <input type="text" id="rpdf-pages" placeholder="Leave blank for all pages" />
               </div>
             </div>
@@ -1319,11 +1319,11 @@
             <div id="ppdf-preview" class="preview-box hidden"></div>
             <div class="form-row two-col">
               <div class="form-group">
-                <label>Password</label>
+                <label for="ppdf-pass">Password</label>
                 <input type="password" id="ppdf-pass" placeholder="Enter password" />
               </div>
               <div class="form-group">
-                <label>Confirm Password</label>
+                <label for="ppdf-pass2">Confirm Password</label>
                 <input type="password" id="ppdf-pass2" placeholder="Re-enter password" />
               </div>
             </div>
@@ -1341,7 +1341,7 @@
             </div>
             <div id="updf-preview" class="preview-box hidden"></div>
             <div class="form-group" style="margin-bottom:1rem">
-              <label>Current Password</label>
+              <label for="updf-pass">Current Password</label>
               <input type="password" id="updf-pass" placeholder="Enter current password" />
             </div>
             <button class="btn btn-primary" id="updf-btn" disabled><span class="btn-icon">🔓</span> Unlock PDF</button>
@@ -1358,21 +1358,21 @@
             <div id="pwm-preview" class="preview-box hidden"></div>
             <div class="form-row two-col">
               <div class="form-group">
-                <label>Watermark Text</label>
+                <label for="pwm-text">Watermark Text</label>
                 <input type="text" id="pwm-text" value="CONFIDENTIAL" placeholder="e.g. DRAFT" />
               </div>
               <div class="form-group">
-                <label>Font Size</label>
+                <label for="pwm-size">Font Size</label>
                 <input type="number" id="pwm-size" value="52" min="12" max="200" />
               </div>
             </div>
             <div class="form-row two-col">
               <div class="form-group">
-                <label>Color</label>
+                <label for="pwm-color">Color</label>
                 <input type="color" id="pwm-color" value="#ff0000" class="color-input" />
               </div>
               <div class="form-group">
-                <label>Opacity: <strong id="pwm-opacity-val">25</strong>%</label>
+                <label for="pwm-opacity">Opacity: <strong id="pwm-opacity-val">25</strong>%</label>
                 <input type="range" class="range-input" id="pwm-opacity" min="5" max="80" value="25" />
               </div>
             </div>
@@ -1467,7 +1467,7 @@
             </div>
             <div class="form-row" style="margin-top:0.75rem">
               <div class="form-group">
-                <label>Custom color</label>
+                <label for="cbg-color">Custom color</label>
                 <input type="color" id="cbg-color" value="#ffffff" class="color-input" style="max-width:120px" />
               </div>
             </div>
@@ -1477,11 +1477,11 @@
           <div id="cbg-opt-gradient" class="hidden">
             <div class="form-row two-col">
               <div class="form-group">
-                <label>From color</label>
+                <label for="cbg-grad-color1">From color</label>
                 <input type="color" id="cbg-grad-color1" value="#6366f1" class="color-input" />
               </div>
               <div class="form-group">
-                <label>To color</label>
+                <label for="cbg-grad-color2">To color</label>
                 <input type="color" id="cbg-grad-color2" value="#ec4899" class="color-input" />
               </div>
             </div>
@@ -1498,7 +1498,7 @@
           <!-- Blur options -->
           <div id="cbg-opt-blur" class="hidden">
             <div class="form-group" style="margin-bottom:1rem">
-              <label>Blur strength: <strong id="cbg-blur-val">20</strong></label>
+              <label for="cbg-blur-amt">Blur strength: <strong id="cbg-blur-val">20</strong></label>
               <input type="range" class="range-input" id="cbg-blur-amt" min="5" max="60" value="20" />
             </div>
           </div>
@@ -1636,7 +1636,7 @@
           <div id="ocr-preview" class="preview-box hidden"></div>
           <div class="form-row two-col" style="margin-top:1rem">
             <div class="form-group">
-              <label>Language</label>
+              <label for="ocr-lang">Language</label>
               <select id="ocr-lang">
                 <option value="eng">English</option>
                 <option value="hin">Hindi</option>
