@@ -195,6 +195,10 @@ def compress_to_target(img, fmt, target_bytes, quality_start=85):
 
 # ---------- routes ----------
 
+@app.route('/googlefdd4ba2b0937db58.html')
+def google_verify():
+    return 'google-site-verification: googlefdd4ba2b0937db58.html', 200, {'Content-Type': 'text/html'}
+
 @app.route('/')
 def index():
     return render_template('index.html',
