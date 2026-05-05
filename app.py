@@ -6,32 +6,32 @@ from PIL import Image, ImageFilter, ImageEnhance, ImageDraw, ImageFont, ImageOps
 try:
     from pypdf import PdfReader, PdfWriter
     PYPDF_AVAILABLE = True
-except ImportError:
+except Exception:
     PYPDF_AVAILABLE = False
 
 try:
     import fitz          # PyMuPDF
     FITZ_AVAILABLE = True
-except ImportError:
+except Exception:
     FITZ_AVAILABLE = False
 
 try:
     from reportlab.pdfgen import canvas as rl_canvas
     from reportlab.lib.colors import Color
     REPORTLAB_AVAILABLE = True
-except ImportError:
+except Exception:
     REPORTLAB_AVAILABLE = False
 
 try:
     import pikepdf
     PIKEPDF_AVAILABLE = True
-except ImportError:
+except Exception:
     PIKEPDF_AVAILABLE = False
 
 try:
     import mammoth
     MAMMOTH_AVAILABLE = True
-except ImportError:
+except Exception:
     MAMMOTH_AVAILABLE = False
 
 try:
@@ -44,21 +44,22 @@ except Exception:
 try:
     import pytesseract
     TESSERACT_AVAILABLE = True
-except ImportError:
+except Exception:
     TESSERACT_AVAILABLE = False
 
 try:
     import cv2
     import numpy as np
     CV2_AVAILABLE = True
-except ImportError:
+except Exception:
     CV2_AVAILABLE = False
 
 try:
     from weasyprint import HTML as WeasyprintHTML
     WEASYPRINT_AVAILABLE = True
-except ImportError:
+except Exception:
     WEASYPRINT_AVAILABLE = False
+    WeasyprintHTML = None
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB upload limit
@@ -84,7 +85,7 @@ logger = logging.getLogger(__name__)
 try:
     from PIL import Image
     PIL_AVAILABLE = True
-except ImportError:
+except Exception:
     PIL_AVAILABLE = False
     logger.warning("Pillow not available")
 
@@ -92,14 +93,14 @@ try:
     from pillow_heif import register_heif_opener
     register_heif_opener()
     HEIF_AVAILABLE = True
-except ImportError:
+except Exception:
     HEIF_AVAILABLE = False
     logger.warning("pillow-heif not available – HEIC conversion disabled")
 
 try:
     import cairosvg
     CAIRO_AVAILABLE = True
-except ImportError:
+except Exception:
     CAIRO_AVAILABLE = False
     logger.warning("cairosvg not available – SVG conversion disabled")
 
