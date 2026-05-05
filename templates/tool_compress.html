@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Compress JPG to 50KB – Free Image Compressor | EditPDFForm{% endblock %}
+{% block description %}Compress JPG images to exactly 50KB, 20KB, 100KB or any custom size online free. Perfect for government forms, SSC, UPSC, bank applications. No sign-up.{% endblock %}
+{% block keywords %}compress jpg to 50kb, reduce image size to 50kb, compress image to 20kb, compress photo for government form, reduce jpg size online free, image compressor{% endblock %}
+{% block canonical_path %}/compress-jpg-to-50kb{% endblock %}
+{% block og_url %}/compress-jpg-to-50kb{% endblock %}
+{% block og_title %}Compress JPG to 50KB Free | EditPDFForm{% endblock %}
+{% block og_desc %}Compress any JPG or PNG to an exact file size — 50KB, 20KB, 100KB. Perfect for SSC, UPSC, bank and passport forms. Free, instant, no watermark.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication",
+ "name":"Image Compressor to Exact KB","applicationCategory":"UtilitiesApplication",
+ "operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+ "description":"Compress JPG images to an exact file size in KB for government forms, job applications and more."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"How do I compress an image to exactly 50KB?","acceptedAnswer":{"@type":"Answer","text":"Upload your JPG or PNG, enter 50 in the 'Target KB' field, and click Compress. EditPDFForm automatically adjusts the quality to hit the exact target size."}},
+  {"@type":"Question","name":"Which government forms require 50KB photos?","acceptedAnswer":{"@type":"Answer","text":"SSC, UPSC, IBPS, SBI, railway recruitment, and most Indian government job portals typically require photos under 50KB and signatures under 20KB."}},
+  {"@type":"Question","name":"Does compressing reduce image quality?","acceptedAnswer":{"@type":"Answer","text":"Some quality reduction is unavoidable when hitting a very low KB target, but EditPDFForm uses smart compression to keep the image as sharp as possible at the target size."}}
+]}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">Exact KB Target · Free · Instant</div>
+  <h1>Compress Image to 50KB</h1>
+  <p>Compress JPG, PNG or WEBP to any exact file size — 50KB, 20KB, 100KB. Perfect for SSC, UPSC, banking, and passport forms. No sign-up required.</p>
+  <a href="/#compress" class="btn btn-primary" style="margin-top:.5rem"><span class="btn-icon">🗜️</span> Compress Now</a>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:2.5rem 1.5rem">
+  <h2 style="color:#f1f5f9;font-size:1.4rem">How to Compress an Image to 50KB</h2>
+  <ol style="color:#94a3b8;line-height:2.2;padding-left:1.4rem">
+    <li>Click <strong style="color:#f1f5f9">Compress Now</strong> and scroll to the Compress section</li>
+    <li>Upload your JPG, PNG, or WEBP image</li>
+    <li>Click the <strong style="color:#f1f5f9">50 KB</strong> preset button (or type any custom value)</li>
+    <li>Click <strong style="color:#f1f5f9">Compress Image</strong> — download starts immediately</li>
+  </ol>
+
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Common Use Cases</h2>
+  <div class="tools-grid" style="padding:0">
+    <div class="tool-card-link" style="cursor:default"><div class="tc-icon">📋</div><h3>SSC / UPSC Forms</h3><p>Most Indian exam portals require photo ≤ 50KB and signature ≤ 20KB</p></div>
+    <div class="tool-card-link" style="cursor:default"><div class="tc-icon">🏦</div><h3>Bank Applications</h3><p>IBPS, SBI, RBI portals typically allow photos up to 50–100KB</p></div>
+    <div class="tool-card-link" style="cursor:default"><div class="tc-icon">🛂</div><h3>Passport & Visa</h3><p>Compress passport photos to meet embassy upload size requirements</p></div>
+  </div>
+
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Frequently Asked Questions</h2>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">How do I compress an image to exactly 50KB?</summary>
+    <p style="margin:.75rem 0 0">Upload your image, enter 50 in the Target KB field, and click Compress. EditPDFForm automatically adjusts quality to hit the exact target.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Can I compress PNG to 50KB?</summary>
+    <p style="margin:.75rem 0 0">Yes. PNG, JPG and WEBP are all supported. For very small targets, converting PNG to JPG first often yields better results.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Is there a minimum achievable size?</summary>
+    <p style="margin:.75rem 0 0">For a typical photo, 10–20KB is the practical minimum while retaining recognisable quality. Going below that will produce a visibly blurry image.</p>
+  </details>
+</div>
+{% endblock %}
+

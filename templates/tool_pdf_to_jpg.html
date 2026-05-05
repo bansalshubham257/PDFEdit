@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}PDF to JPG Converter – Free Online | EditPDFForm{% endblock %}
+{% block description %}Convert PDF pages to JPG or PNG images online free. Extract every page as a high-quality image. No sign-up, no watermark, instant download.{% endblock %}
+{% block keywords %}pdf to jpg, pdf to image, convert pdf to jpg online free, pdf to png, extract images from pdf, pdf page to jpg{% endblock %}
+{% block canonical_path %}/pdf-to-jpg{% endblock %}
+{% block og_title %}PDF to JPG Converter Free | EditPDFForm{% endblock %}
+{% block og_desc %}Convert PDF pages to JPG or PNG images online free. High quality, instant, no sign-up.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication",
+ "name":"PDF to JPG Converter","applicationCategory":"UtilitiesApplication",
+ "operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+ "description":"Convert PDF pages to JPG or PNG images online free. Supports custom DPI and page range selection."}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">High Quality · Custom DPI · Free</div>
+  <h1>PDF to JPG Converter</h1>
+  <p>Convert every page of a PDF into a JPG or PNG image. Choose custom DPI for high-resolution output. Download all pages as a ZIP file. Free, no sign-up.</p>
+  <a href="/#pdf-tools" class="btn btn-primary" style="margin-top:.5rem"><span class="btn-icon">📸</span> Convert PDF to JPG</a>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:2.5rem 1.5rem">
+  <h2 style="color:#f1f5f9;font-size:1.4rem">How to Convert PDF to JPG</h2>
+  <ol style="color:#94a3b8;line-height:2.2;padding-left:1.4rem">
+    <li>Click <strong style="color:#f1f5f9">Convert PDF to JPG</strong> → scroll to PDF Tools → Convert → PDF to Images</li>
+    <li>Upload your PDF file</li>
+    <li>Choose output format (JPG or PNG) and DPI (150 for screen, 300 for print)</li>
+    <li>Optionally select specific pages</li>
+    <li>Click <strong style="color:#f1f5f9">Convert to Images</strong> — all pages download as a ZIP</li>
+  </ol>
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Frequently Asked Questions</h2>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">What DPI should I use for best quality?</summary>
+    <p style="margin:.75rem 0 0">Use 150 DPI for screen display and web use. Use 300 DPI for printing. Higher DPI produces larger file sizes.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1mm;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Can I convert just one page of a PDF?</summary>
+    <p style="margin:.75rem 0 0">Yes. Enter a page number or range (e.g. "1" or "2-5") in the Pages field before converting.</p>
+  </details>
+</div>
+{% endblock %}
+

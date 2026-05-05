@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Contact EditPDFForm – Free PDF Editor & Form Filler Support{% endblock %}
+{% block description %}Contact EditPDFForm for help with our free PDF form filler, PDF editor, sign PDF tool or any image tools. Report a bug or request a feature — we'd love to hear from you.{% endblock %}
+{% block keywords %}contact editpdfform, pdf editor support, fill pdf form help, free pdf tools support{% endblock %}
+{% block canonical_path %}/contact{% endblock %}
+{% block og_url %}/contact{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">Contact Us</div>
+  <h1>Get in Touch</h1>
+  <p>Found a bug? Have a feature request? We'd love to hear from you.</p>
+</div>
+
+<div class="static-page">
+  <h2>Send us a message</h2>
+  <form id="contact-form" style="display:flex;flex-direction:column;gap:1rem;max-width:540px">
+    <div>
+      <label style="display:block;font-size:.88rem;color:#94a3b8;margin-bottom:.35rem">Your Name</label>
+      <input type="text" name="name" placeholder="John Doe" required
+        style="width:100%;padding:.6rem .9rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f1f5f9;font-size:.95rem;box-sizing:border-box" />
+    </div>
+    <div>
+      <label style="display:block;font-size:.88rem;color:#94a3b8;margin-bottom:.35rem">Email Address</label>
+      <input type="email" name="email" placeholder="you@example.com" required
+        style="width:100%;padding:.6rem .9rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f1f5f9;font-size:.95rem;box-sizing:border-box" />
+    </div>
+    <div>
+      <label style="display:block;font-size:.88rem;color:#94a3b8;margin-bottom:.35rem">Subject</label>
+      <select name="subject"
+        style="width:100%;padding:.6rem .9rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:#1e1e2e;color:#f1f5f9;font-size:.95rem;box-sizing:border-box">
+        <option>Bug Report</option>
+        <option>Feature Request</option>
+        <option>General Question</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div>
+      <label style="display:block;font-size:.88rem;color:#94a3b8;margin-bottom:.35rem">Message</label>
+      <textarea name="message" rows="5" placeholder="Describe your issue or idea…" required
+        style="width:100%;padding:.6rem .9rem;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f1f5f9;font-size:.95rem;resize:vertical;box-sizing:border-box"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" style="align-self:flex-start">
+      <span class="btn-icon">📧</span> Send Message
+    </button>
+    <div id="contact-msg" style="display:none;padding:.75rem 1rem;border-radius:8px;background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3)">
+      ✅ Thanks! We'll get back to you soon.
+    </div>
+  </form>
+
+  <h2 style="margin-top:3rem">Other Ways to Reach Us</h2>
+  <p>For urgent issues or partnership enquiries you can also reach us at <strong style="color:#818cf8">hello@editpdfform.com</strong></p>
+
+  <p style="margin-top:2rem;color:#475569;font-size:.88rem">We typically respond within 24–48 hours on business days.</p>
+</div>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('contact-msg').style.display = 'block';
+  e.target.reset();
+});
+</script>
+{% endblock %}
+

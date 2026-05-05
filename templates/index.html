@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>EditPDFForm – Fill PDF Form Online Free | PDF Editor, Sign PDF, Edit PDF</title>
+  <meta name="description" content="Fill PDF forms online for free — type on any PDF, add signatures, check boxes, edit text, and download instantly. Also merge PDF, compress images, JPG to PDF and more. No sign-up. No Adobe needed." />
+  <meta name="keywords" content="fill pdf form online, fill pdf form online free, pdf form filler, edit pdf online free, online pdf editor, fill and sign pdf, type on pdf, add text to pdf, pdf filler no sign up, sign pdf online, free pdf editor, pdf annotator online, edit pdf without adobe acrobat, fill out pdf online, interactive pdf form filler, pdf writer online, compress pdf, merge pdf, jpg to pdf, pdf to jpg, compress image to 50kb, resize image, passport photo maker, remove background, image converter, free online tools, pdf tools" />
+  <meta name="author" content="EditPDFForm" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://editpdfform.com/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="EditPDFForm" />
+  <meta property="og:title"       content="EditPDFForm – Fill PDF Form Online Free | PDF Editor & Sign PDF" />
+  <meta property="og:description" content="Fill PDF forms, edit PDF text, add signatures and download — free, no sign-up, no Adobe needed. Plus image tools: compress, resize, convert." />
+  <meta property="og:image"       content="https://editpdfform.com/static/og-image.png" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url"         content="https://editpdfform.com/" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="EditPDFForm – Fill PDF Form Online | Free PDF Editor" />
+  <meta name="twitter:description" content="Fill PDF forms, edit & sign PDFs online for free. No sign-up, no Adobe needed. Plus image tools." />
+  <meta name="twitter:image"       content="https://editpdfform.com/static/og-image.png" />
+
+  <!-- Schema.org WebSite -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"EditPDFForm",
+   "url":"https://editpdfform.com",
+   "description":"Free online PDF editor — fill PDF forms, edit PDF text, sign PDF, merge PDF, and more image tools.",
+   "potentialAction":{"@type":"SearchAction","target":"https://editpdfform.com/?q={search_term_string}","query-input":"required name=search_term_string"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"EditPDFForm PDF Editor",
+   "applicationCategory":"UtilitiesApplication","operatingSystem":"Web",
+   "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+   "description":"Fill PDF forms online, edit PDF text, add signatures, merge PDF, compress images. Free, no sign-up, works in browser.",
+   "featureList":"Fill PDF form online, Edit PDF online, Sign PDF, Merge PDF, Compress PDF, PDF Form Filler, Add text to PDF, PDF Annotator"}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+  <style>
+    /* ── Mobile nav ── */
+    .nav-toggle{display:none;background:none;border:none;color:#f1f5f9;font-size:1.5rem;cursor:pointer;padding:.25rem .5rem;margin-left:auto}
+    @media(max-width:900px){
+      .nav-toggle{display:block}
+      .nav-links{display:none!important;flex-direction:column!important;position:fixed!important;top:54px;left:0;right:0;background:#0f0f1a;padding:.75rem 1.25rem 1.25rem;gap:.1rem!important;z-index:999;border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.5);overflow-y:auto;max-height:calc(100vh - 54px)}
+      .nav-links.open{display:flex!important}
+      .nav-links li{border-bottom:1px solid rgba(255,255,255,.05);padding:.1rem 0}
+      .nav-links a{padding:.55rem .25rem;display:block;font-size:.95rem}
+    }
+    /* ── Tool category cards ── */
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.1rem;max-width:1200px;margin:0 auto 2.5rem;padding:0 1rem}
+    .cat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:1.4rem 1.6rem;text-decoration:none;color:#f1f5f9;transition:all .2s;display:block}
+    .cat-card:hover{border-color:#6366f1;background:rgba(99,102,241,.1);transform:translateY(-3px)}
+    .cat-card .cat-icon{font-size:2.2rem;margin-bottom:.7rem}
+    .cat-card h3{font-size:1.05rem;font-weight:700;margin:0 0 .35rem}
+    .cat-card p{font-size:.82rem;color:#64748b;margin:0;line-height:1.6}
+    /* ── Section label ── */
+    .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6366f1;margin-bottom:.5rem}
+    /* ── Mobile tool section ── */
+    @media(max-width:640px){
+      .tool-section{padding:1.5rem .75rem}
+      .hero h1{font-size:2rem}
+      .hero-stats{gap:1rem}
+      .form-row.two-col{grid-template-columns:1fr}
+      .card{padding:1.25rem 1rem}
+    }
+    /* ── Footer ── */
+    .site-footer{background:#0a0a14;border-top:1px solid rgba(255,255,255,.07);padding:3rem 1.5rem 1.5rem;margin-top:4rem}
+    .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2rem;max-width:1100px;margin:0 auto}
+    .footer-col h4{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#475569;margin:0 0 .8rem}
+    .footer-col ul{list-style:none;padding:0;margin:0}
+    .footer-col li{margin-bottom:.45rem}
+    .footer-col a{color:#475569;text-decoration:none;font-size:.83rem;transition:color .15s}
+    .footer-col a:hover{color:#818cf8}
+    .footer-bottom{max-width:1100px;margin:1.5rem auto 0;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+    .footer-bottom p{color:#334155;font-size:.78rem;margin:0}
+  </style>
+</head>
+<body>
+
+  <!-- ░░ NAV ░░ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/">
+        <span class="brand-icon">⚡</span>
+        <span>EditPDFForm</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+      <ul class="nav-links" id="nav-links" role="navigation" aria-label="Main navigation">
+        <li><a href="/fill-pdf-form-online" style="color:#a5b4fc;font-weight:600">📋 Fill PDF Form</a></li>
+        <li><a href="/edit-pdf-online" style="color:#a5b4fc;font-weight:600">✏️ Edit PDF</a></li>
+        <li><a href="/sign-pdf-online">✍️ Sign PDF</a></li>
+        <li><a href="#pdf-tools">📄 PDF Tools</a></li>
+        <li><a href="#image-tools">🖼️ Image Tools</a></li>
+        <li><a href="#india">🇮🇳 India Forms</a></li>
+        <li><a href="#ai-tools">🤖 AI Tools</a></li>
+        <li style="border-top:1px solid rgba(255,255,255,.1);margin-top:.25rem;padding-top:.25rem"><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ░░ HERO ░░ -->
+  <section class="hero" aria-label="Hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">✨ 100% Free • No sign-up • No Adobe needed</div>
+      <h1>Fill PDF Forms &amp;<br /><span class="gradient-text">Edit PDF Online Free</span></h1>
+      <p class="hero-sub">Fill out any PDF form online, edit PDF text, add signatures, merge PDFs — no Adobe Acrobat, no sign-up. Also compress, resize &amp; convert images.</p>
+      <div class="hero-stats">
+        <div class="stat"><strong>20+</strong><span>Tools</span></div>
+        <div class="stat"><strong>0</strong><span>Sign-ups</span></div>
+        <div class="stat"><strong>Free</strong><span>Forever</span></div>
+      </div>
+      <!-- Quick-access tool links — PDF first -->
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1.5rem">
+        <a href="/fill-pdf-form-online"    class="hero-chip" style="background:rgba(99,102,241,.25);border-color:#6366f1">📋 Fill PDF Form</a>
+        <a href="/edit-pdf-online"         class="hero-chip" style="background:rgba(99,102,241,.25);border-color:#6366f1">✏️ Edit PDF</a>
+        <a href="/sign-pdf-online"         class="hero-chip">✍️ Sign PDF</a>
+        <a href="/merge-pdf"               class="hero-chip">📎 Merge PDF</a>
+        <a href="/jpg-to-pdf"              class="hero-chip">JPG→PDF</a>
+        <a href="/compress-jpg-to-50kb"    class="hero-chip">Compress 50KB</a>
+        <a href="/passport-photo-maker"    class="hero-chip">Passport Photo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ CATEGORY OVERVIEW ░░ -->
+  <section style="padding:2.5rem 1rem 1rem" aria-label="Tool categories">
+    <div style="text-align:center;margin-bottom:1.75rem">
+      <div class="section-label">What can you do?</div>
+      <h2 style="font-size:1.5rem;color:#f1f5f9;margin:0">Jump to any tool</h2>
+    </div>
+    <div class="cat-grid">
+      <a href="/fill-pdf-form-online" class="cat-card" style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.08)">
+        <div class="cat-icon">📋</div>
+        <h3>Fill PDF Form Online ⭐</h3>
+        <p>Type text, tick checkboxes, complete government forms, job applications & more. Works with any PDF.</p>
+      </a>
+      <a href="/edit-pdf-online" class="cat-card" style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.08)">
+        <div class="cat-icon">✏️</div>
+        <h3>Edit PDF Online ⭐</h3>
+        <p>Add text anywhere, insert images, draw shapes, highlight, annotate — no Adobe needed.</p>
+      </a>
+      <a href="/sign-pdf-online" class="cat-card">
+        <div class="cat-icon">✍️</div>
+        <h3>Sign PDF Online</h3>
+        <p>Draw, type or upload your signature and place it on any PDF. Free, no sign-up.</p>
+      </a>
+      <a href="#pdf-tools" class="cat-card">
+        <div class="cat-icon">📄</div>
+        <h3>PDF Tools</h3>
+        <p>Merge, split, compress, rotate, protect, unlock, watermark, PDF↔Image, Word→PDF</p>
+      </a>
+      <a href="#image-tools" class="cat-card">
+        <div class="cat-icon">🖼️</div>
+        <h3>Image Tools</h3>
+        <p>Convert, compress, resize, crop, edit effects, watermark, add text, strip EXIF</p>
+      </a>
+      <a href="#india" class="cat-card">
+        <div class="cat-icon">🇮🇳</div>
+        <h3>India Govt Forms</h3>
+        <p>Passport photo 35×45mm, signature resize for SSC/UPSC, compress to 20KB/50KB</p>
+      </a>
+      <a href="#ai-tools" class="cat-card">
+        <div class="cat-icon">🤖</div>
+        <h3>AI Tools</h3>
+        <p>Remove background, upscale 4×, cartoonify, OCR text extraction, PDF text extraction</p>
+      </a>
+    </div>
+  </section>
+
+  <main class="main" id="image-tools">
+
+    <!-- ═══════════════════════════════════════
+         PDF EDITOR SECTION
+    ═══════════════════════════════════════ -->
+    <section id="pdf-editor" class="tool-section" style="padding:2rem 1rem 4rem;max-width:1400px;margin:0 auto">
+      <div class="section-header">
+        <div class="section-icon">✏️</div>
+        <div>
+          <h2>PDF Editor</h2>
+          <p>Fill forms, type anywhere, add your signature on multiple pages — download the completed PDF instantly</p>
+        </div>
+      </div>
+
+      <div class="card" id="pdfed-upload-card">
+        <div class="upload-zone" id="pdfed-drop">
+          <div class="upload-icon">📄</div>
+          <p><strong>Drop your PDF here</strong> or <label class="link-label" for="pdfed-file">browse</label></p>
+          <p class="upload-hint">PDF up to 50 MB</p>
+          <input type="file" id="pdfed-file" accept=".pdf,application/pdf" hidden />
+        </div>
+        <div id="pdfed-status" class="status-msg hidden"></div>
+
+        <!-- Password prompt — shown only for encrypted PDFs -->
+        <div id="pdfed-password-row" style="display:none;margin-top:1rem;gap:0.5rem;align-items:center;flex-wrap:wrap">
+          <span style="font-size:0.9rem">🔒 This PDF is password-protected:</span>
+          <input type="password" id="pdfed-password" placeholder="Enter PDF password…"
+            style="padding:0.35rem 0.6rem;border-radius:6px;border:1px solid var(--border,#444);background:var(--bg,#141420);color:inherit;font-size:0.9rem;flex:1;min-width:180px" />
+          <button class="btn btn-primary btn-sm" id="pdfed-unlock-btn">🔓 Unlock &amp; Open</button>
+        </div>
+      </div>
+
+      <!-- Editor workspace — hidden until PDF loaded -->
+      <div id="pdfed-workspace" class="hidden">
+        <div id="pdfed-toolbar" style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;padding:0.75rem 1rem;background:var(--surface,#1e1e2e);border-radius:12px;margin-bottom:1rem;margin-top:1rem">
+          <strong style="font-size:0.9rem;color:var(--text-muted,#888)">Tool:</strong>
+          <button class="btn btn-sm pdfed-tool active" data-tool="text" id="pdfed-tool-text">📝 Add Text</button>
+          <button class="btn btn-sm pdfed-tool" data-tool="signature" id="pdfed-tool-sig">✍️ Add Signature</button>
+          <button class="btn btn-sm pdfed-tool" data-tool="checkbox" id="pdfed-tool-chk">☑️ Tick Checkbox</button>
+          <div style="display:flex;align-items:center;gap:0.4rem;margin-left:0.5rem">
+            <label style="font-size:0.8rem;color:var(--text-muted,#888)">Font size:</label>
+            <input type="number" id="pdfed-fontsize" value="14" min="6" max="72"
+              style="width:60px;padding:0.25rem 0.4rem;border-radius:6px;border:1px solid var(--border,#333);background:var(--bg,#141420);color:inherit" />
+          </div>
+          <div style="display:flex;align-items:center;gap:0.4rem">
+            <label style="font-size:0.8rem;color:var(--text-muted,#888)">Color:</label>
+            <input type="color" id="pdfed-color" value="#000000"
+              style="width:36px;height:30px;border:none;cursor:pointer;background:transparent" />
+          </div>
+          <div style="margin-left:auto;display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button class="btn btn-sm" id="pdfed-undo-btn">↩️ Undo</button>
+            <button class="btn btn-sm" id="pdfed-clear-btn">🗑️ Clear All</button>
+            <button class="btn btn-primary" id="pdfed-save-btn"><span class="btn-icon">⬇️</span> Download Filled PDF</button>
+          </div>
+        </div>
+        <div style="padding:0.3rem 0 0.75rem;color:var(--text-muted,#888);font-size:0.85rem">
+          <span id="pdfed-ann-count">0 annotations</span> &nbsp;·&nbsp;
+          Click anywhere on a page to place text or a signature
+        </div>
+        <div id="pdfed-pages" style="display:flex;flex-direction:column;gap:2rem;align-items:center"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 1 — CONVERT
+    ═══════════════════════════════════════ -->
+    <section id="convert" class="tool-section">
+
+      <div class="section-header">
+        <div class="section-icon">🔄</div>
+        <div>
+          <h2>Image Conversion</h2>
+          <p>Convert between JPG, PNG, WEBP, HEIC, SVG, BMP, TIFF and more</p>
+        </div>
+      </div>
+
+      <!-- Format grid chips -->
+      <div class="format-chips">
+        <button class="chip active" data-from="JPG" data-to="PNG">JPG → PNG</button>
+        <button class="chip" data-from="PNG" data-to="JPG">PNG → JPG</button>
+        <button class="chip" data-from="WEBP" data-to="JPG">WEBP → JPG</button>
+        <button class="chip" data-from="WEBP" data-to="PNG">WEBP → PNG</button>
+        <button class="chip {% if not heif_available %}chip-disabled{% endif %}" data-from="HEIC" data-to="JPG" {% if not heif_available %}title="HEIC support not installed on server"{% endif %}>HEIC → JPG {% if not heif_available %}<span class="badge-warn">!</span>{% endif %}</button>
+        <button class="chip {% if not cairo_available %}chip-disabled{% endif %}" data-from="SVG" data-to="PNG" {% if not cairo_available %}title="SVG support not installed on server"{% endif %}>SVG → PNG {% if not cairo_available %}<span class="badge-warn">!</span>{% endif %}</button>
+        <button class="chip" data-from="BMP" data-to="JPG">BMP → JPG</button>
+        <button class="chip" data-from="TIFF" data-to="PNG">TIFF → PNG</button>
+        <button class="chip" data-from="ANY" data-to="WEBP">ANY → WEBP</button>
+        <button class="chip" data-from="PNG" data-to="BMP">PNG → BMP</button>
+      </div>
+
+      <div class="card">
+        <div class="upload-zone" id="convert-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="convert-file">browse</label></p>
+          <p class="upload-hint">JPG, PNG, WEBP, BMP, TIFF, GIF, HEIC, SVG — up to 50 MB</p>
+          <input type="file" id="convert-file" accept="image/*,.heic,.heif,.svg,.tiff,.tif,.bmp,.webp" hidden />
+        </div>
+        <div id="convert-preview" class="preview-box hidden"></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Output Format</label>
+            <select id="convert-format">
+              <option value="png">PNG</option>
+              <option value="jpg">JPG / JPEG</option>
+              <option value="webp">WEBP</option>
+              <option value="bmp">BMP</option>
+              <option value="tiff">TIFF</option>
+              <option value="gif">GIF</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="convert-btn" disabled>
+          <span class="btn-icon">⚡</span> Convert Image
+        </button>
+        <div id="convert-status" class="status-msg hidden"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 2 — COMPRESS
+    ═══════════════════════════════════════ -->
+    <section id="compress" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">🗜️</div>
+        <div>
+          <h2>Image Compression</h2>
+          <p>Reduce file size while keeping quality. Perfect for government / job form uploads.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="upload-zone" id="compress-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="compress-file">browse</label></p>
+          <p class="upload-hint">JPG, PNG, WEBP — up to 50 MB</p>
+          <input type="file" id="compress-file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" hidden />
+        </div>
+        <div id="compress-preview" class="preview-box hidden"></div>
+
+        <!-- Target size presets -->
+        <div class="sub-label">Target file size (popular presets):</div>
+        <div class="preset-chips">
+          <button class="preset-chip" data-kb="20">20 KB</button>
+          <button class="preset-chip" data-kb="50">50 KB</button>
+          <button class="preset-chip" data-kb="100">100 KB</button>
+          <button class="preset-chip" data-kb="200">200 KB</button>
+          <button class="preset-chip" data-kb="500">500 KB</button>
+          <button class="preset-chip active" data-kb="">Custom quality</button>
+        </div>
+
+        <div class="form-row" id="compress-kb-row" style="display:none">
+          <div class="form-group">
+            <label>Target size (KB)</label>
+            <input type="number" id="compress-kb" placeholder="e.g. 50" min="5" max="10000" />
+          </div>
+        </div>
+
+        <div class="form-row" id="compress-quality-row">
+          <div class="form-group">
+            <label>Quality: <strong id="quality-val">80</strong>%</label>
+            <input type="range" id="compress-quality" min="10" max="95" value="80" class="range-input" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="compress-btn" disabled>
+          <span class="btn-icon">🗜️</span> Compress Image
+        </button>
+        <div id="compress-status" class="status-msg hidden"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 3 — RESIZE
+    ═══════════════════════════════════════ -->
+    <section id="resize" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">📐</div>
+        <div>
+          <h2>Resize / Dimensions</h2>
+          <p>Resize by dimensions, percentage or use a popular preset</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="upload-zone" id="resize-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="resize-file">browse</label></p>
+          <p class="upload-hint">Any image format — up to 50 MB</p>
+          <input type="file" id="resize-file" accept="image/*" hidden />
+        </div>
+        <div id="resize-preview" class="preview-box hidden"></div>
+
+        <!-- Resize mode tabs -->
+        <div class="tab-group">
+          <button class="tab active" data-tab="dimensions">By Dimensions</button>
+          <button class="tab" data-tab="percentage">By Percentage</button>
+          <button class="tab" data-tab="preset">Presets</button>
+        </div>
+
+        <!-- By dimensions -->
+        <div class="tab-content active" id="tab-dimensions">
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label>Width (px)</label>
+              <input type="number" id="resize-width" placeholder="e.g. 1920" min="1" />
+            </div>
+            <div class="form-group">
+              <label>Height (px)</label>
+              <input type="number" id="resize-height" placeholder="e.g. 1080" min="1" />
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="resize-ratio" checked />
+            <span>Maintain aspect ratio</span>
+          </label>
+        </div>
+
+        <!-- By percentage -->
+        <div class="tab-content hidden" id="tab-percentage">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Scale: <strong id="pct-val">50</strong>%</label>
+              <input type="range" id="resize-pct" min="5" max="200" value="50" class="range-input" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="tab-content hidden" id="tab-preset">
+          <div class="preset-grid">
+            <button class="preset-card" data-preset="200x200">
+              <span class="preset-name">200 × 200</span>
+              <span class="preset-desc">Avatar / Thumbnail</span>
+            </button>
+            <button class="preset-card" data-preset="300x300">
+              <span class="preset-name">300 × 300</span>
+              <span class="preset-desc">Profile Photo</span>
+            </button>
+            <button class="preset-card" data-preset="413x531">
+              <span class="preset-name">413 × 531</span>
+              <span class="preset-desc">Passport Photo (US)</span>
+            </button>
+            <button class="preset-card" data-preset="600x600">
+              <span class="preset-name">600 × 600</span>
+              <span class="preset-desc">Instagram Post</span>
+            </button>
+            <button class="preset-card" data-preset="1080x1080">
+              <span class="preset-name">1080 × 1080</span>
+              <span class="preset-desc">Instagram HD</span>
+            </button>
+            <button class="preset-card" data-preset="1280x720">
+              <span class="preset-name">1280 × 720</span>
+              <span class="preset-desc">HD 720p</span>
+            </button>
+            <button class="preset-card" data-preset="1920x1080">
+              <span class="preset-name">1920 × 1080</span>
+              <span class="preset-desc">Full HD 1080p</span>
+            </button>
+            <button class="preset-card" data-preset="3840x2160">
+              <span class="preset-name">3840 × 2160</span>
+              <span class="preset-desc">4K UHD</span>
+            </button>
+          </div>
+          <div id="preset-selected" class="preset-selected-label hidden">Selected: <strong id="preset-val"></strong></div>
+        </div>
+
+        <button class="btn btn-primary" id="resize-btn" disabled>
+          <span class="btn-icon">📐</span> Resize Image
+        </button>
+        <div id="resize-status" class="status-msg hidden"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 4 — IMAGE TO PDF
+    ═══════════════════════════════════════ -->
+    <section id="pdf" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">📄</div>
+        <div>
+          <h2>Images → PDF</h2>
+          <p>Combine one or more images into a single PDF document</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="upload-zone" id="pdf-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop images here</strong> or <label class="link-label" for="pdf-file">browse</label></p>
+          <p class="upload-hint">Multiple images supported — order = upload order</p>
+          <input type="file" id="pdf-file" accept="image/*" multiple hidden />
+        </div>
+        <div id="pdf-list" class="file-list hidden"></div>
+
+        <button class="btn btn-primary" id="pdf-btn" disabled>
+          <span class="btn-icon">📄</span> Create PDF
+        </button>
+        <div id="pdf-status" class="status-msg hidden"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 5 — STRIP METADATA
+    ═══════════════════════════════════════ -->
+    <section id="strip" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">🔒</div>
+        <div>
+          <h2>Strip Metadata</h2>
+          <p>Remove EXIF data (GPS location, device info, etc.) for privacy</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="upload-zone" id="strip-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="strip-file">browse</label></p>
+          <p class="upload-hint">JPG, PNG, WEBP — up to 50 MB</p>
+          <input type="file" id="strip-file" accept="image/*" hidden />
+        </div>
+        <div id="strip-preview" class="preview-box hidden"></div>
+
+        <button class="btn btn-primary" id="strip-btn" disabled>
+          <span class="btn-icon">🔒</span> Strip & Download Clean Image
+        </button>
+        <div id="strip-status" class="status-msg hidden"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 6 — CROP & ROTATE (client-side via Cropper.js)
+    ═══════════════════════════════════════ -->
+    <section id="crop" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">✂️</div>
+        <div>
+          <h2>Crop & Rotate</h2>
+          <p>Crop freely, create circle profile pics, rotate & flip — all instant, no upload needed</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Upload zone -->
+        <div class="upload-zone" id="crop-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="crop-file">browse</label></p>
+          <p class="upload-hint">Any image format — processed entirely in your browser</p>
+          <input type="file" id="crop-file" accept="image/*" hidden />
+        </div>
+
+        <!-- Cropper workspace (hidden until image loaded) -->
+        <div id="crop-workspace" class="hidden">
+          <div class="crop-container">
+            <img id="crop-img" alt="crop" />
+          </div>
+
+          <!-- Rotate / Flip controls -->
+          <div class="crop-controls">
+            <div class="action-group">
+              <button class="action-btn" id="crop-rotate-left">↺ Left 90°</button>
+              <button class="action-btn" id="crop-rotate-right">↻ Right 90°</button>
+              <button class="action-btn" id="crop-rotate-180">↔ 180°</button>
+              <button class="action-btn" id="crop-flip-h">⇄ Flip H</button>
+              <button class="action-btn" id="crop-flip-v">⇅ Flip V</button>
+            </div>
+
+            <!-- Aspect ratio presets -->
+            <div class="sub-label" style="margin-top:1rem">Aspect ratio:</div>
+            <div class="action-group">
+              <button class="action-btn ratio-btn active" data-ratio="NaN">Free</button>
+              <button class="action-btn ratio-btn" data-ratio="1">1:1</button>
+              <button class="action-btn ratio-btn" data-ratio="1.333">4:3</button>
+              <button class="action-btn ratio-btn" data-ratio="1.778">16:9</button>
+              <button class="action-btn ratio-btn" data-ratio="0.75">3:4</button>
+            </div>
+
+            <!-- Circle crop -->
+            <label class="checkbox-label" style="margin-top:0.85rem">
+              <input type="checkbox" id="circle-crop-toggle" />
+              <span>⭕ Circle crop (profile picture) — exports as PNG</span>
+            </label>
+          </div>
+
+          <div class="crop-btn-row">
+            <button class="btn btn-primary" id="crop-download-btn">
+              <span class="btn-icon">✂️</span> Crop & Download
+            </button>
+            <button class="btn btn-outline" id="crop-reset-btn">↩ Reset</button>
+            <button class="btn btn-outline" id="crop-change-btn">📁 Change Image</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 7 — EDIT & EFFECTS
+    ═══════════════════════════════════════ -->
+    <section id="edit" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">🎨</div>
+        <div>
+          <h2>Edit & Effects</h2>
+          <p>Brightness, contrast, sharpen, blur, B&amp;W, sepia, watermark, add text</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Upload zone -->
+        <div class="upload-zone" id="edit-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="edit-file">browse</label></p>
+          <p class="upload-hint">JPG, PNG, WEBP — up to 50 MB</p>
+          <input type="file" id="edit-file" accept="image/*" hidden />
+        </div>
+
+        <!-- Workspace -->
+        <div id="edit-workspace" class="hidden">
+          <!-- Live preview -->
+          <div class="edit-preview-wrap">
+            <img id="edit-live-img" class="edit-live-img" alt="preview" />
+            <div class="edit-preview-badge">Live Preview (CSS)</div>
+          </div>
+
+          <!-- Edit tabs -->
+          <div class="tab-group" style="justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+              <button class="tab active" data-etab="adjustments">🎛️ Adjustments</button>
+              <button class="tab" data-etab="effects">✨ Effects</button>
+              <button class="tab" data-etab="watermark">💧 Watermark & Text</button>
+            </div>
+            <button class="btn-reset-all" id="reset-all-btn" title="Reset everything to defaults">↩ Reset All</button>
+          </div>
+
+          <!-- Adjustments tab -->
+          <div class="etab-content active" id="etab-adjustments">
+            <div class="slider-grid">
+              <div class="form-group">
+                <label>☀️ Brightness <strong id="val-brightness">1.0</strong> <button class="sl-reset" data-for="sl-brightness" data-default="1.0" title="Reset">↺</button></label>
+                <input type="range" class="range-input edit-slider" id="sl-brightness" min="0.1" max="3.0" step="0.05" value="1.0" data-css="brightness" />
+              </div>
+              <div class="form-group">
+                <label>🌗 Contrast <strong id="val-contrast">1.0</strong> <button class="sl-reset" data-for="sl-contrast" data-default="1.0" title="Reset">↺</button></label>
+                <input type="range" class="range-input edit-slider" id="sl-contrast" min="0.1" max="3.0" step="0.05" value="1.0" data-css="contrast" />
+              </div>
+              <div class="form-group">
+                <label>🎨 Saturation <strong id="val-saturation">1.0</strong> <button class="sl-reset" data-for="sl-saturation" data-default="1.0" title="Reset">↺</button></label>
+                <input type="range" class="range-input edit-slider" id="sl-saturation" min="0.0" max="3.0" step="0.05" value="1.0" data-css="saturate" />
+              </div>
+              <div class="form-group">
+                <label>🔪 Sharpness <strong id="val-sharpness">1.0</strong> <button class="sl-reset" data-for="sl-sharpness" data-default="1.0" title="Reset">↺</button></label>
+                <input type="range" class="range-input edit-slider" id="sl-sharpness" min="0.0" max="5.0" step="0.1" value="1.0" data-css="none" />
+              </div>
+              <div class="form-group">
+                <label>💫 Blur <strong id="val-blur">0</strong>px <button class="sl-reset" data-for="sl-blur" data-default="0" title="Reset">↺</button></label>
+                <input type="range" class="range-input edit-slider" id="sl-blur" min="0" max="20" step="0.5" value="0" data-css="blur" />
+              </div>
+            </div>
+            <button class="btn btn-sm" id="reset-adjustments-btn">↩ Reset All Sliders</button>
+          </div>
+
+          <!-- Effects tab -->
+          <div class="etab-content hidden" id="etab-effects">
+            <p class="sub-label" style="margin-bottom:0.85rem">Click a filter to apply — click again to remove. One active at a time.</p>
+            <div class="effects-grid">
+              <button class="effect-card" data-fx="none" id="fx-none">
+                <span class="effect-thumb" style="filter:none"></span>
+                <span class="effect-name">Original</span>
+              </button>
+              <button class="effect-card" data-fx="grayscale" id="fx-grayscale">
+                <span class="effect-thumb" style="filter:grayscale(1)"></span>
+                <span class="effect-name">B &amp; W</span>
+              </button>
+              <button class="effect-card" data-fx="sepia" id="fx-sepia">
+                <span class="effect-thumb" style="filter:sepia(1)"></span>
+                <span class="effect-name">Sepia</span>
+              </button>
+              <button class="effect-card" data-fx="invert" id="fx-invert">
+                <span class="effect-thumb" style="filter:invert(1)"></span>
+                <span class="effect-name">Invert</span>
+              </button>
+              <button class="effect-card" data-fx="vivid" id="fx-vivid">
+                <span class="effect-thumb" style="filter:saturate(2.2) contrast(1.2)"></span>
+                <span class="effect-name">Vivid</span>
+              </button>
+              <button class="effect-card" data-fx="vintage" id="fx-vintage">
+                <span class="effect-thumb" style="filter:sepia(0.5) contrast(0.8) brightness(0.95) saturate(0.7)"></span>
+                <span class="effect-name">Vintage</span>
+              </button>
+              <button class="effect-card" data-fx="cool" id="fx-cool">
+                <span class="effect-thumb" style="filter:hue-rotate(25deg) saturate(1.3) brightness(1.05)"></span>
+                <span class="effect-name">Cool</span>
+              </button>
+              <button class="effect-card" data-fx="warm" id="fx-warm">
+                <span class="effect-thumb" style="filter:sepia(0.25) saturate(1.6) brightness(1.05)"></span>
+                <span class="effect-name">Warm</span>
+              </button>
+              <button class="effect-card" data-fx="faded" id="fx-faded">
+                <span class="effect-thumb" style="filter:contrast(0.65) brightness(1.2) saturate(0.6)"></span>
+                <span class="effect-name">Faded</span>
+              </button>
+              <button class="effect-card" data-fx="highcontrast" id="fx-highcontrast">
+                <span class="effect-thumb" style="filter:contrast(1.8) brightness(1.05)"></span>
+                <span class="effect-name">High Contrast</span>
+              </button>
+              <button class="effect-card" data-fx="dramatic" id="fx-dramatic">
+                <span class="effect-thumb" style="filter:grayscale(1) contrast(1.5) brightness(0.85)"></span>
+                <span class="effect-name">Dramatic</span>
+              </button>
+              <button class="effect-card" data-fx="matte" id="fx-matte">
+                <span class="effect-thumb" style="filter:contrast(0.8) brightness(1.1) saturate(0.8)"></span>
+                <span class="effect-name">Matte</span>
+              </button>
+            </div>
+            <button class="btn btn-sm" id="reset-effects-btn" style="margin-top:1rem">↩ Clear Effect</button>
+          </div>
+
+          <!-- Watermark & Text tab -->
+          <div class="etab-content hidden" id="etab-watermark">
+            <!-- Live canvas preview -->
+            <div class="wm-preview-wrap">
+              <canvas id="wm-canvas" class="wm-canvas"></canvas>
+              <div class="edit-preview-badge">Live Watermark Preview</div>
+            </div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Watermark / Text</label>
+                <input type="text" id="wm-text" placeholder="© YourName 2025" value="© ImageKit" />
+              </div>
+              <div class="form-group">
+                <label>Font Size</label>
+                <input type="number" id="wm-size" value="40" min="10" max="200" />
+              </div>
+            </div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Text Color</label>
+                <input type="color" id="wm-color" value="#ffffff" class="color-input" />
+              </div>
+              <div class="form-group">
+                <label>Opacity: <strong id="wm-opacity-val">70</strong>%</label>
+                <input type="range" class="range-input" id="wm-opacity" min="10" max="100" value="70" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Position</label>
+                <div class="position-grid">
+                  <button class="pos-btn" data-pos="top-left">↖</button>
+                  <button class="pos-btn" data-pos="top-center">↑</button>
+                  <button class="pos-btn" data-pos="top-right">↗</button>
+                  <button class="pos-btn" data-pos="middle-left">←</button>
+                  <button class="pos-btn" data-pos="center">⊙</button>
+                  <button class="pos-btn" data-pos="middle-right">→</button>
+                  <button class="pos-btn" data-pos="bottom-left">↙</button>
+                  <button class="pos-btn" data-pos="bottom-center">↓</button>
+                  <button class="pos-btn active" data-pos="bottom-right">↘</button>
+                </div>
+              </div>
+            </div>
+            <label class="checkbox-label" style="margin-bottom:0.75rem">
+              <input type="checkbox" id="wm-repeat" />
+              <span>Repeat watermark across entire image</span>
+            </label>
+            <div>
+              <button class="btn btn-sm" id="reset-watermark-btn">↩ Reset Watermark Defaults</button>
+            </div>
+          </div>
+
+          <!-- Download buttons -->
+          <div class="edit-btn-row">
+            <button class="btn btn-primary" id="edit-apply-btn">
+              <span class="btn-icon">🎨</span> Apply & Download
+            </button>
+            <button class="btn btn-outline" id="edit-change-btn">📁 Change Image</button>
+          </div>
+          <div id="edit-status" class="status-msg hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 8 — ADD TEXT TO IMAGE
+    ═══════════════════════════════════════ -->
+    <section id="addtext" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">✍️</div>
+        <div>
+          <h2>Add Text to Image</h2>
+          <p>Type text, choose style & color — <strong>click anywhere on the preview</strong> to position it</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="upload-zone" id="at-drop">
+          <div class="upload-icon">📁</div>
+          <p><strong>Drop your image here</strong> or <label class="link-label" for="at-file">browse</label></p>
+          <p class="upload-hint">Any image format — up to 50 MB</p>
+          <input type="file" id="at-file" accept="image/*" hidden />
+        </div>
+
+        <div id="at-workspace" class="hidden">
+          <!-- Clickable canvas preview -->
+          <div class="at-canvas-wrap">
+            <canvas id="at-canvas" class="at-canvas"></canvas>
+            <div class="at-hint-badge">👆 Click to position text</div>
+          </div>
+
+          <!-- Controls -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Text</label>
+              <input type="text" id="at-text" placeholder="Your text here…" value="Hello World" />
+            </div>
+          </div>
+          <div class="slider-grid">
+            <div class="form-group">
+              <label>Font Size <strong id="at-size-val">60</strong>px</label>
+              <input type="range" class="range-input" id="at-size" min="10" max="300" value="60" />
+            </div>
+            <div class="form-group">
+              <label>Text Color</label>
+              <input type="color" id="at-color" value="#ffffff" class="color-input" />
+            </div>
+          </div>
+          <div class="action-group" style="margin-bottom:1rem">
+            <button class="action-btn at-style-btn active" data-style="bold">B Bold</button>
+            <button class="action-btn at-style-btn" data-style="italic">I Italic</button>
+            <button class="action-btn at-style-btn" data-style="shadow">◑ Shadow</button>
+            <button class="action-btn at-style-btn" data-style="bgbox">▬ BG Box</button>
+          </div>
+          <div id="at-bgbox-controls" class="form-row two-col hidden">
+            <div class="form-group">
+              <label>Box Color</label>
+              <input type="color" id="at-bg-color" value="#000000" class="color-input" />
+            </div>
+            <div class="form-group">
+              <label>Box Opacity <strong id="at-bg-opacity-val">60</strong>%</label>
+              <input type="range" class="range-input" id="at-bg-opacity" min="10" max="100" value="60" />
+            </div>
+          </div>
+          <div class="edit-btn-row">
+            <button class="btn btn-primary" id="at-download-btn">
+              <span class="btn-icon">✍️</span> Download with Text
+            </button>
+            <button class="btn btn-outline" id="at-reset-btn">↩ Reset</button>
+            <button class="btn btn-outline" id="at-change-btn">📁 Change Image</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 9 — INDIA OFFICIAL / GOVT USE
+    ═══════════════════════════════════════ -->
+    <section id="india" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">🇮🇳</div>
+        <div>
+          <h2>India Official / Govt Use</h2>
+          <p>Passport photos, signature resizing, SSC/UPSC 20KB photos, photo–signature merge</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tab-group">
+          <button class="tab active" data-gtab="passport">🪪 Passport Photo</button>
+          <button class="tab" data-gtab="signature">✍️ Signature Resize</button>
+          <button class="tab" data-gtab="govtcompress">📋 SSC/UPSC 20KB</button>
+          <button class="tab" data-gtab="merge">🔗 Merge Photo+Sig</button>
+        </div>
+
+        <!-- ── Passport Photo ── -->
+        <div class="gtab-content active" id="gtab-passport">
+          <div class="upload-zone" id="pp-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop your photo</strong> or <label class="link-label" for="pp-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG — passport / ID photo</p>
+            <input type="file" id="pp-file" accept="image/*" hidden />
+          </div>
+          <div id="pp-preview" class="preview-box hidden"></div>
+          <div class="form-row two-col">
+            <div class="form-group">
+              <label>Photo Size</label>
+              <select id="pp-size">
+                <option value="35x45mm">35×45mm — India Passport / Visa ✅</option>
+                <option value="51x51mm">51×51mm — US Passport</option>
+                <option value="40x40mm">40×40mm — UAE / Gulf ID</option>
+                <option value="35x35mm">35×35mm — India ID Card</option>
+                <option value="25x35mm">25×35mm — PAN / Aadhaar style</option>
+                <option value="50x70mm">50×70mm — A-Type Visa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Background Color</label>
+              <div style="display:flex;gap:0.5rem;align-items:center">
+                <input type="color" id="pp-bg" value="#ffffff" class="color-input" style="flex:1" />
+                <button class="action-btn" id="pp-bg-white">White</button>
+                <button class="action-btn" id="pp-bg-blue">Blue</button>
+              </div>
+            </div>
+          </div>
+          <label class="checkbox-label" style="margin-bottom:1rem">
+            <input type="checkbox" id="pp-sheet" />
+            <span>Create 4-up sheet (4 photos on one page — print-ready)</span>
+          </label>
+          <button class="btn btn-primary" id="pp-btn" disabled>
+            <span class="btn-icon">🪪</span> Create Passport Photo
+          </button>
+          <div id="pp-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ── Signature Resize ── -->
+        <div class="gtab-content hidden" id="gtab-signature">
+
+          <!-- Mode toggle -->
+          <div class="sig-mode-toggle">
+            <button class="sig-mode-btn active" id="sig-mode-upload-btn" data-mode="upload">📁 Upload Image</button>
+            <button class="sig-mode-btn"        id="sig-mode-draw-btn"   data-mode="draw">✏️ Draw Signature</button>
+          </div>
+
+          <!-- ── Upload mode ── -->
+          <div id="sig-upload-panel">
+            <div class="upload-zone" id="sig-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop your signature</strong> or <label class="link-label" for="sig-file">browse</label></p>
+              <p class="upload-hint">JPG, PNG — scanned signature on white paper</p>
+              <input type="file" id="sig-file" accept="image/*" hidden />
+            </div>
+            <div id="sig-preview" class="preview-box hidden"></div>
+          </div>
+
+          <!-- ── Draw mode ── -->
+          <div id="sig-draw-panel" class="hidden">
+            <!-- Toolbar -->
+            <div class="sig-draw-toolbar">
+              <div class="sig-tool-group">
+                <span class="sig-tool-label">Ink</span>
+                <button class="sig-color-btn active" data-color="#000000" style="background:#000000" title="Black"></button>
+                <button class="sig-color-btn"        data-color="#1a3fa5" style="background:#1a3fa5" title="Blue"></button>
+                <button class="sig-color-btn"        data-color="#c0392b" style="background:#c0392b" title="Red"></button>
+              </div>
+              <div class="sig-tool-group">
+                <span class="sig-tool-label">Thickness</span>
+                <button class="sig-thick-btn active" data-thick="2"  title="Fine">—</button>
+                <button class="sig-thick-btn"        data-thick="3.5" title="Medium"><strong>—</strong></button>
+                <button class="sig-thick-btn"        data-thick="5.5" title="Bold"><b style="font-size:1.1em">—</b></button>
+              </div>
+              <div class="sig-tool-group" style="margin-left:auto">
+                <button class="action-btn" id="sig-undo-btn" title="Undo last stroke">↩ Undo</button>
+                <button class="action-btn" id="sig-clear-btn" title="Clear canvas">🗑 Clear</button>
+              </div>
+            </div>
+
+            <!-- Canvas pad -->
+            <div class="sig-pad-wrap">
+              <canvas id="sig-pad-canvas" class="sig-pad-canvas"></canvas>
+              <div class="sig-pad-hint" id="sig-pad-hint">✍️ Sign here</div>
+            </div>
+
+            <!-- Use signature button -->
+            <div style="display:flex;gap:0.75rem;align-items:center;margin-top:0.85rem;flex-wrap:wrap">
+              <button class="btn btn-primary" id="sig-use-drawn-btn">
+                <span class="btn-icon">✅</span> Use This Signature
+              </button>
+              <button class="btn btn-outline hidden" id="sig-download-raw-btn">
+                <span class="btn-icon">⬇️</span> Download Signature
+              </button>
+              <span id="sig-draw-confirm" class="sig-draw-confirm hidden">✅ Signature ready — adjust size below &amp; click Resize</span>
+            </div>
+          </div>
+
+          <!-- ── Shared: preset sizes + resize button ── -->
+          <div id="sig-resize-controls" style="margin-top:1.1rem">
+            <div class="sub-label" style="margin-bottom:0.6rem">Exam / Form preset sizes:</div>
+            <div class="sig-preset-grid">
+              <button class="sig-preset active" data-sig="ssc">SSC<br/><span>140×60 px</span></button>
+              <button class="sig-preset" data-sig="upsc">UPSC<br/><span>150×60 px</span></button>
+              <button class="sig-preset" data-sig="ibps">IBPS<br/><span>140×60 px</span></button>
+              <button class="sig-preset" data-sig="sbi">SBI PO<br/><span>160×80 px</span></button>
+              <button class="sig-preset" data-sig="railway">Railway<br/><span>150×70 px</span></button>
+              <button class="sig-preset" data-sig="passport">Passport<br/><span>200×100 px</span></button>
+              <button class="sig-preset" data-sig="generic">Generic<br/><span>200×80 px</span></button>
+              <button class="sig-preset" data-sig="custom">Custom</button>
+            </div>
+            <div id="sig-custom-row" class="form-row two-col hidden">
+              <div class="form-group">
+                <label>Width (px)</label>
+                <input type="number" id="sig-w" value="140" min="10" />
+              </div>
+              <div class="form-group">
+                <label>Height (px)</label>
+                <input type="number" id="sig-h" value="60" min="10" />
+              </div>
+            </div>
+            <label class="checkbox-label" style="margin:0.75rem 0">
+              <input type="checkbox" id="sig-white-bg" checked />
+              <span>White background (JPG) — required for most forms</span>
+            </label>
+            <button class="btn btn-primary" id="sig-btn" disabled>
+              <span class="btn-icon">✍️</span> Resize Signature
+            </button>
+            <div id="sig-status" class="status-msg hidden"></div>
+          </div>
+        </div>
+
+        <!-- ── SSC/UPSC 20KB Compress ── -->
+        <div class="gtab-content hidden" id="gtab-govtcompress">
+          <div class="govtcompress-hero">
+            <div class="govtcompress-icon">📋</div>
+            <div>
+              <h3>Photo under target KB</h3>
+              <p>SSC, UPSC, Railway, Banking — most forms require photo ≤ 20KB or 50KB</p>
+            </div>
+          </div>
+          <div class="upload-zone" id="gc-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop your photo</strong> or <label class="link-label" for="gc-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG, WEBP — scanned / camera photo</p>
+            <input type="file" id="gc-file" accept="image/*" hidden />
+          </div>
+          <div id="gc-preview" class="preview-box hidden"></div>
+          <div class="sub-label" style="margin-bottom:0.5rem">Target size:</div>
+          <div class="preset-chips">
+            <button class="preset-chip active" data-gckb="20">20 KB (SSC/Railway)</button>
+            <button class="preset-chip" data-gckb="50">50 KB (UPSC/Bank)</button>
+            <button class="preset-chip" data-gckb="100">100 KB</button>
+            <button class="preset-chip" data-gckb="200">200 KB</button>
+            <button class="preset-chip" data-gckb="500">500 KB</button>
+          </div>
+          <button class="btn btn-primary" id="gc-btn" disabled>
+            <span class="btn-icon">📋</span> Compress for Govt Form
+          </button>
+          <div id="gc-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ── Merge Photo + Signature ── -->
+        <div class="gtab-content hidden" id="gtab-merge">
+          <div class="merge-upload-row">
+            <div class="merge-upload-box">
+              <div class="upload-zone small-zone" id="merge-photo-drop">
+                <div class="upload-icon" style="font-size:1.5rem">🖼️</div>
+                <p><strong>Photo</strong> or <label class="link-label" for="merge-photo-file">browse</label></p>
+                <input type="file" id="merge-photo-file" accept="image/*" hidden />
+              </div>
+              <div id="merge-photo-preview" class="preview-box hidden"></div>
+            </div>
+            <div class="merge-plus">+</div>
+            <div class="merge-upload-box">
+              <div class="upload-zone small-zone" id="merge-sig-drop">
+                <div class="upload-icon" style="font-size:1.5rem">✍️</div>
+                <p><strong>Signature</strong> or <label class="link-label" for="merge-sig-file">browse</label></p>
+                <input type="file" id="merge-sig-file" accept="image/*" hidden />
+              </div>
+              <div id="merge-sig-preview" class="preview-box hidden"></div>
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:1rem">
+            <div class="form-group">
+              <label>Layout</label>
+              <select id="merge-layout">
+                <option value="form">📄 Govt Form Layout (Photo right, Signature left)</option>
+                <option value="side-by-side">↔ Side by Side</option>
+                <option value="above-below">↕ Above / Below</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="merge-btn" disabled>
+            <span class="btn-icon">🔗</span> Merge & Download
+          </button>
+          <div id="merge-status" class="status-msg hidden"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         TOOL 10 — PDF TOOLS
+    ═══════════════════════════════════════ -->
+    <section id="pdf-tools" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">📄</div>
+        <div>
+          <h2>PDF Tools</h2>
+          <p>Convert · Merge · Split · Compress · Protect · Watermark and more</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Category nav -->
+        <div class="pdf-cat-nav">
+          <button class="pdf-cat-btn active" data-cat="convert">🔄 Convert</button>
+          <button class="pdf-cat-btn"        data-cat="organize">📋 Organize</button>
+          <button class="pdf-cat-btn"        data-cat="optimize">⚙️ Optimize</button>
+        </div>
+
+        <!-- ══ CONVERT ══════════════════════════════════ -->
+        <div class="pdf-cat active" id="pdfcat-convert">
+
+          <!-- Quick-pick chips -->
+          <div class="format-chips" id="pdf-conv-chips">
+            <button class="chip active" data-pconv="jpg2pdf">JPG → PDF</button>
+            <button class="chip"        data-pconv="png2pdf">PNG → PDF</button>
+            <button class="chip"        data-pconv="word2pdf">Word → PDF</button>
+            <button class="chip"        data-pconv="pdf2jpg">PDF → JPG</button>
+            <button class="chip"        data-pconv="pdf2png">PDF → PNG</button>
+          </div>
+
+          <div class="tab-group">
+            <button class="tab active" data-pdftab="img2pdf">🖼️ Images → PDF</button>
+            <button class="tab"        data-pdftab="pdf2img">📸 PDF → Images</button>
+            <button class="tab"        data-pdftab="word2pdf">📝 Word → PDF</button>
+          </div>
+
+          <!-- Images → PDF -->
+          <div class="pdftab-content active" id="pdftab-img2pdf">
+            <div class="upload-zone" id="i2p-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop images here</strong> or <label class="link-label" for="i2p-file">browse</label></p>
+              <p class="upload-hint" id="i2p-hint">JPG, PNG, WEBP — multiple files supported, order = upload order</p>
+              <input type="file" id="i2p-file" accept="image/*" multiple hidden />
+            </div>
+            <div id="i2p-list" class="file-list hidden"></div>
+            <button class="btn btn-primary" id="i2p-btn" disabled><span class="btn-icon">📄</span> Create PDF</button>
+            <div id="i2p-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- PDF → Images -->
+          <div class="pdftab-content hidden" id="pdftab-pdf2img">
+            <div class="upload-zone" id="p2i-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="p2i-file">browse</label></p>
+              <p class="upload-hint">PDF file — up to 50 MB</p>
+              <input type="file" id="p2i-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="p2i-info" class="pdf-info-bar hidden"></div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Output Format</label>
+                <select id="p2i-fmt">
+                  <option value="jpg">JPG (smaller size)</option>
+                  <option value="png">PNG (best quality)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Resolution (DPI)</label>
+                <select id="p2i-dpi">
+                  <option value="96">96 DPI — Screen</option>
+                  <option value="150" selected>150 DPI — Standard</option>
+                  <option value="200">200 DPI — High</option>
+                  <option value="300">300 DPI — Print Quality</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Pages (leave blank for all)</label>
+              <input type="text" id="p2i-pages" placeholder="e.g. 1-3 or 1,3,5 or leave blank for all" />
+            </div>
+            <button class="btn btn-primary" id="p2i-btn" disabled><span class="btn-icon">📸</span> Convert to Images</button>
+            <div id="p2i-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Word → PDF -->
+          <div class="pdftab-content hidden" id="pdftab-word2pdf">
+            <div class="upload-zone" id="w2p-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop Word file here</strong> or <label class="link-label" for="w2p-file">browse</label></p>
+              <p class="upload-hint">.docx / .doc files — up to 50 MB. Formatting, tables and images preserved.</p>
+              <input type="file" id="w2p-file" accept=".docx,.doc,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden />
+            </div>
+            <div id="w2p-info" class="pdf-info-bar hidden"></div>
+            <button class="btn btn-primary" id="w2p-btn" disabled><span class="btn-icon">📝</span> Convert to PDF</button>
+            <div id="w2p-status" class="status-msg hidden"></div>
+          </div>
+        </div>
+
+        <!-- ══ ORGANIZE ══════════════════════════════════ -->
+        <div class="pdf-cat hidden" id="pdfcat-organize">
+          <div class="tab-group">
+            <button class="tab active" data-pdftab="merge">🔗 Merge</button>
+            <button class="tab"        data-pdftab="split">✂️ Split</button>
+            <button class="tab"        data-pdftab="delete-pages">🗑️ Delete Pages</button>
+            <button class="tab"        data-pdftab="rearrange">🔀 Rearrange</button>
+            <button class="tab"        data-pdftab="rotate-pdf">🔄 Rotate</button>
+          </div>
+
+          <!-- Merge -->
+          <div class="pdftab-content active" id="pdftab-merge">
+            <div class="upload-zone" id="merge-pdf-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF files here</strong> or <label class="link-label" for="merge-pdf-file">browse</label></p>
+              <p class="upload-hint">Select multiple PDFs — they will be merged in order</p>
+              <input type="file" id="merge-pdf-file" accept=".pdf,application/pdf" multiple hidden />
+            </div>
+            <div id="merge-pdf-list" class="file-list hidden"></div>
+            <button class="btn btn-primary" id="merge-pdf-btn" disabled><span class="btn-icon">🔗</span> Merge PDFs</button>
+            <div id="merge-pdf-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Split -->
+          <div class="pdftab-content hidden" id="pdftab-split">
+            <div class="upload-zone" id="split-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="split-file">browse</label></p>
+              <input type="file" id="split-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="split-info" class="pdf-info-bar hidden"></div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Split Method</label>
+              <select id="split-type">
+                <option value="each">Every page into separate PDF</option>
+                <option value="range">By page ranges (e.g. 1-3, 4-6)</option>
+                <option value="every_n">Every N pages</option>
+              </select>
+            </div>
+            <div class="form-group hidden" id="split-range-row" style="margin-bottom:1rem">
+              <label>Page Ranges (comma-separated)</label>
+              <input type="text" id="split-ranges" placeholder="e.g. 1-3,4-6,7-10" />
+            </div>
+            <div class="form-group hidden" id="split-n-row" style="margin-bottom:1rem">
+              <label>Pages per part</label>
+              <input type="number" id="split-n" value="1" min="1" />
+            </div>
+            <button class="btn btn-primary" id="split-btn" disabled><span class="btn-icon">✂️</span> Split PDF</button>
+            <div id="split-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Delete Pages -->
+          <div class="pdftab-content hidden" id="pdftab-delete-pages">
+            <div class="upload-zone" id="del-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="del-file">browse</label></p>
+              <input type="file" id="del-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="del-info" class="pdf-info-bar hidden"></div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Pages to delete <span class="sub-label">(1-indexed, e.g. 1,3,5-7)</span></label>
+              <input type="text" id="del-pages" placeholder="e.g. 2,4-6,9" />
+            </div>
+            <button class="btn btn-primary" id="del-btn" disabled><span class="btn-icon">🗑️</span> Delete Pages</button>
+            <div id="del-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Rearrange -->
+          <div class="pdftab-content hidden" id="pdftab-rearrange">
+            <div class="upload-zone" id="rear-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="rear-file">browse</label></p>
+              <input type="file" id="rear-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="rear-info" class="pdf-info-bar hidden"></div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>New page order <span class="sub-label">(comma-separated, e.g. 3,1,2,4)</span></label>
+              <input type="text" id="rear-order" placeholder="e.g. 3,1,2,4,5" />
+            </div>
+            <button class="btn btn-primary" id="rear-btn" disabled><span class="btn-icon">🔀</span> Rearrange Pages</button>
+            <div id="rear-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Rotate -->
+          <div class="pdftab-content hidden" id="pdftab-rotate-pdf">
+            <div class="upload-zone" id="rpdf-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="rpdf-file">browse</label></p>
+              <input type="file" id="rpdf-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="rpdf-info" class="pdf-info-bar hidden"></div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Rotation Angle</label>
+                <div class="action-group">
+                  <button class="action-btn pdf-angle-btn active" data-angle="90">↻ 90°</button>
+                  <button class="action-btn pdf-angle-btn"        data-angle="180">↔ 180°</button>
+                  <button class="action-btn pdf-angle-btn"        data-angle="270">↺ 270°</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Pages to rotate</label>
+                <input type="text" id="rpdf-pages" placeholder="Leave blank for all pages" />
+              </div>
+            </div>
+            <button class="btn btn-primary" id="rpdf-btn" disabled><span class="btn-icon">🔄</span> Rotate PDF</button>
+            <div id="rpdf-status" class="status-msg hidden"></div>
+          </div>
+        </div>
+
+        <!-- ══ OPTIMIZE ══════════════════════════════════ -->
+        <div class="pdf-cat hidden" id="pdfcat-optimize">
+          <div class="tab-group">
+            <button class="tab active" data-pdftab="compress-pdf">🗜️ Compress</button>
+            <button class="tab"        data-pdftab="protect-pdf">🔒 Protect</button>
+            <button class="tab"        data-pdftab="unlock-pdf">🔓 Unlock</button>
+            <button class="tab"        data-pdftab="pdf-wm">💧 Watermark</button>
+          </div>
+
+          <!-- Compress -->
+          <div class="pdftab-content active" id="pdftab-compress-pdf">
+            <div class="upload-zone" id="cpdf-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="cpdf-file">browse</label></p>
+              <input type="file" id="cpdf-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="cpdf-preview" class="preview-box hidden"></div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Compression Level</label>
+              <div class="action-group">
+                <button class="action-btn pdf-level-btn" data-level="low">🟢 Low (fast)</button>
+                <button class="action-btn pdf-level-btn active" data-level="medium">🟡 Medium</button>
+                <button class="action-btn pdf-level-btn" data-level="high">🔴 High (max)</button>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="cpdf-btn" disabled><span class="btn-icon">🗜️</span> Compress PDF</button>
+            <div id="cpdf-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Protect -->
+          <div class="pdftab-content hidden" id="pdftab-protect-pdf">
+            <div class="upload-zone" id="ppdf-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="ppdf-file">browse</label></p>
+              <input type="file" id="ppdf-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="ppdf-preview" class="preview-box hidden"></div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="ppdf-pass" placeholder="Enter password" />
+              </div>
+              <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="ppdf-pass2" placeholder="Re-enter password" />
+              </div>
+            </div>
+            <button class="btn btn-primary" id="ppdf-btn" disabled><span class="btn-icon">🔒</span> Protect PDF</button>
+            <div id="ppdf-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- Unlock -->
+          <div class="pdftab-content hidden" id="pdftab-unlock-pdf">
+            <div class="upload-zone" id="updf-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="updf-file">browse</label></p>
+              <p class="upload-hint">Password-protected PDF — enter the password to unlock</p>
+              <input type="file" id="updf-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="updf-preview" class="preview-box hidden"></div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Current Password</label>
+              <input type="password" id="updf-pass" placeholder="Enter current password" />
+            </div>
+            <button class="btn btn-primary" id="updf-btn" disabled><span class="btn-icon">🔓</span> Unlock PDF</button>
+            <div id="updf-status" class="status-msg hidden"></div>
+          </div>
+
+          <!-- PDF Watermark -->
+          <div class="pdftab-content hidden" id="pdftab-pdf-wm">
+            <div class="upload-zone" id="pwm-drop">
+              <div class="upload-icon">📁</div>
+              <p><strong>Drop PDF here</strong> or <label class="link-label" for="pwm-file">browse</label></p>
+              <input type="file" id="pwm-file" accept=".pdf,application/pdf" hidden />
+            </div>
+            <div id="pwm-preview" class="preview-box hidden"></div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Watermark Text</label>
+                <input type="text" id="pwm-text" value="CONFIDENTIAL" placeholder="e.g. DRAFT" />
+              </div>
+              <div class="form-group">
+                <label>Font Size</label>
+                <input type="number" id="pwm-size" value="52" min="12" max="200" />
+              </div>
+            </div>
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>Color</label>
+                <input type="color" id="pwm-color" value="#ff0000" class="color-input" />
+              </div>
+              <div class="form-group">
+                <label>Opacity: <strong id="pwm-opacity-val">25</strong>%</label>
+                <input type="range" class="range-input" id="pwm-opacity" min="5" max="80" value="25" />
+              </div>
+            </div>
+            <label class="checkbox-label" style="margin-bottom:1rem">
+              <input type="checkbox" id="pwm-diagonal" checked />
+              <span>Diagonal watermark (recommended)</span>
+            </label>
+            <button class="btn btn-primary" id="pwm-btn" disabled><span class="btn-icon">💧</span> Add Watermark</button>
+            <div id="pwm-status" class="status-msg hidden"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         AI TOOLS
+    ═══════════════════════════════════════ -->
+    <section id="ai-tools" class="tool-section">
+      <div class="section-header">
+        <div class="section-icon">🤖</div>
+        <div>
+          <h2>AI-Powered Tools</h2>
+          <p>Background removal · Upscale · Cartoon · OCR · Extract PDF text</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Tab nav -->
+        <div class="tab-group ai-tab-group">
+          <button class="tab active" data-aitab="remove-bg">🪄 Remove BG</button>
+          <button class="tab"        data-aitab="change-bg">🖼️ Change BG</button>
+          <button class="tab"        data-aitab="upscale">🔍 Upscale</button>
+          <button class="tab"        data-aitab="cartoon">🎨 Cartoon</button>
+          <button class="tab"        data-aitab="ocr">📝 OCR</button>
+          <button class="tab"        data-aitab="pdf-text">📄 PDF → Text</button>
+          <button class="tab"        data-aitab="dress-swap">👗 Dress Swap</button>
+        </div>
+
+        <!-- ── Remove Background ── -->
+        <div class="aitab-content active" id="aitab-remove-bg">
+          <p class="sub-label" style="margin-bottom:1rem">✂️ Automatically removes the background from any photo using AI. Output is a transparent PNG.</p>
+          <div class="upload-zone" id="rbg-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop image here</strong> or <label class="link-label" for="rbg-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG, WEBP — portrait, product or object photos work best</p>
+            <input type="file" id="rbg-file" accept="image/*" hidden />
+          </div>
+          <div id="rbg-preview" class="preview-box hidden"></div>
+          <button class="btn btn-primary" id="rbg-btn" disabled>
+            <span class="btn-icon">🪄</span> Remove Background
+          </button>
+          <div id="rbg-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ── Change Background ── -->
+        <div class="aitab-content hidden" id="aitab-change-bg">
+          <p class="sub-label" style="margin-bottom:1rem">🖼️ Replace the background with a solid colour, gradient, blur, or your own image.</p>
+
+          <!-- Subject image upload -->
+          <div class="upload-zone" id="cbg-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop your photo here</strong> or <label class="link-label" for="cbg-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG, WEBP — the subject will be auto-detected by AI</p>
+            <input type="file" id="cbg-file" accept="image/*" hidden />
+          </div>
+          <div id="cbg-preview" class="preview-box hidden"></div>
+
+          <!-- Background type selector -->
+          <div class="form-group" style="margin-top:1rem;margin-bottom:1rem">
+            <label>New Background Type</label>
+            <div class="action-group" id="cbg-type-group">
+              <button class="action-btn cbg-type-btn active" data-bgtype="color">🎨 Solid Color</button>
+              <button class="action-btn cbg-type-btn"        data-bgtype="gradient">🌈 Gradient</button>
+              <button class="action-btn cbg-type-btn"        data-bgtype="blur">💫 Blur Original</button>
+              <button class="action-btn cbg-type-btn"        data-bgtype="preset">🏞️ Scene Preset</button>
+              <button class="action-btn cbg-type-btn"        data-bgtype="image">🖼️ Custom Image</button>
+            </div>
+          </div>
+
+          <!-- Solid color options -->
+          <div id="cbg-opt-color">
+            <div class="sub-label">Quick presets:</div>
+            <div class="cbg-color-swatches">
+              <button class="cbg-swatch" data-color="#ffffff" style="background:#ffffff" title="White"></button>
+              <button class="cbg-swatch" data-color="#000000" style="background:#000000" title="Black"></button>
+              <button class="cbg-swatch" data-color="#f0f4ff" style="background:#f0f4ff" title="Light Blue"></button>
+              <button class="cbg-swatch" data-color="#e8f5e9" style="background:#e8f5e9" title="Light Green"></button>
+              <button class="cbg-swatch" data-color="#fff8e1" style="background:#fff8e1" title="Cream"></button>
+              <button class="cbg-swatch" data-color="#fce4ec" style="background:#fce4ec" title="Rose"></button>
+              <button class="cbg-swatch" data-color="#1a1a2e" style="background:#1a1a2e" title="Dark Navy"></button>
+              <button class="cbg-swatch" data-color="#6366f1" style="background:#6366f1" title="Indigo"></button>
+            </div>
+            <div class="form-row" style="margin-top:0.75rem">
+              <div class="form-group">
+                <label>Custom color</label>
+                <input type="color" id="cbg-color" value="#ffffff" class="color-input" style="max-width:120px" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Gradient options -->
+          <div id="cbg-opt-gradient" class="hidden">
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label>From color</label>
+                <input type="color" id="cbg-grad-color1" value="#6366f1" class="color-input" />
+              </div>
+              <div class="form-group">
+                <label>To color</label>
+                <input type="color" id="cbg-grad-color2" value="#ec4899" class="color-input" />
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Direction</label>
+              <div class="action-group">
+                <button class="action-btn cbg-dir-btn active" data-dir="horizontal">↔ Horizontal</button>
+                <button class="action-btn cbg-dir-btn"        data-dir="vertical">↕ Vertical</button>
+                <button class="action-btn cbg-dir-btn"        data-dir="diagonal">↗ Diagonal</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Blur options -->
+          <div id="cbg-opt-blur" class="hidden">
+            <div class="form-group" style="margin-bottom:1rem">
+              <label>Blur strength: <strong id="cbg-blur-val">20</strong></label>
+              <input type="range" class="range-input" id="cbg-blur-amt" min="5" max="60" value="20" />
+            </div>
+          </div>
+
+          <!-- Scene Preset options -->
+          <div id="cbg-opt-preset" class="hidden">
+            <div class="sub-label" style="margin-bottom:0.75rem">Choose a scene background:</div>
+            <div class="cbg-scene-grid" id="cbg-scene-grid">
+              <button class="cbg-scene-card" data-scene="beach"     data-url="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#00c6ff,#f7d86c)">🏖️</div>
+                <span>Beach</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="mountains" data-url="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#4facfe,#a8edea)">⛰️</div>
+                <span>Mountains</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="forest"    data-url="https://images.unsplash.com/photo-1448375240586-882707db888b?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#134e5e,#71b280)">🌲</div>
+                <span>Forest</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="city"      data-url="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#373b44,#4286f4)">🌆</div>
+                <span>City</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="library"   data-url="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#c9a96e,#5c4033)">📚</div>
+                <span>Library</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="house"     data-url="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#f5af19,#f12711)">🏠</div>
+                <span>House</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="club"      data-url="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#200122,#6f0000)">🎉</div>
+                <span>Club / Party</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="office"    data-url="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#d7d2cc,#304352)">🏢</div>
+                <span>Office</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="sunset"    data-url="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#f83600,#f9d423)">🌅</div>
+                <span>Sunset</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="space"     data-url="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)">🌌</div>
+                <span>Space</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="cafe"      data-url="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#c79081,#dfa579)">☕</div>
+                <span>Café</span>
+              </button>
+              <button class="cbg-scene-card" data-scene="winter"    data-url="https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=1280&q=80">
+                <div class="cbg-scene-thumb" style="background:linear-gradient(135deg,#e0eafc,#cfdef3)">❄️</div>
+                <span>Winter / Snow</span>
+              </button>
+            </div>
+            <p id="cbg-scene-selected" class="upload-hint" style="margin-top:0.5rem;color:#6366f1;font-weight:600"></p>
+          </div>
+
+          <!-- Custom image upload -->
+          <div id="cbg-opt-image" class="hidden">
+            <div class="upload-zone" id="cbg-bg-drop" style="padding:1.5rem">
+              <div class="upload-icon" style="font-size:1.8rem">🖼️</div>
+              <p><strong>Drop background image</strong> or <label class="link-label" for="cbg-bg-file">browse</label></p>
+              <p class="upload-hint">Any image — will be resized to match your photo</p>
+              <input type="file" id="cbg-bg-file" accept="image/*" hidden />
+            </div>
+            <div id="cbg-bg-preview" class="preview-box hidden"></div>
+          </div>
+
+          <button class="btn btn-primary" id="cbg-btn" disabled style="margin-top:1rem">
+            <span class="btn-icon">🖼️</span> Change Background
+          </button>
+          <div id="cbg-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ── Upscale ── -->
+        <div class="aitab-content hidden" id="aitab-upscale">
+          <p class="sub-label" style="margin-bottom:1rem">🔍 Enlarge image up to 4× with smart sharpening to preserve detail.</p>
+          <div class="upload-zone" id="ups-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop image here</strong> or <label class="link-label" for="ups-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG, WEBP — up to 50 MB</p>
+            <input type="file" id="ups-file" accept="image/*" hidden />
+          </div>
+          <div id="ups-preview" class="preview-box hidden"></div>
+          <div class="form-group" style="margin-top:1rem">
+            <label>Scale Factor</label>
+            <div class="action-group">
+              <button class="action-btn scale-btn active" data-scale="2">× 2</button>
+              <button class="action-btn scale-btn"        data-scale="3">× 3</button>
+              <button class="action-btn scale-btn"        data-scale="4">× 4</button>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="ups-btn" disabled style="margin-top:1rem">
+            <span class="btn-icon">🔍</span> Upscale Image
+          </button>
+          <div id="ups-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ── Cartoon ── -->
+        <div class="aitab-content hidden" id="aitab-cartoon">
+          <p class="sub-label" style="margin-bottom:1rem">🎨 Convert your photo into a cartoon, pencil sketch or anime-style illustration.</p>
+          <div class="upload-zone" id="cart-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop image here</strong> or <label class="link-label" for="cart-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG, WEBP — portraits and landscapes work great</p>
+            <input type="file" id="cart-file" accept="image/*" hidden />
+          </div>
+          <div id="cart-preview" class="preview-box hidden"></div>
+          <div class="form-group" style="margin-top:1rem">
+            <label>Style</label>
+            <div class="action-group">
+              <button class="action-btn style-btn active" data-style="cartoon">🎨 Cartoon</button>
+              <button class="action-btn style-btn"        data-style="sketch">✏️ Sketch</button>
+              <button class="action-btn style-btn"        data-style="anime">🌸 Anime</button>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="cart-btn" disabled style="margin-top:1rem">
+            <span class="btn-icon">🎨</span> Convert to Cartoon
+          </button>
+          <div id="cart-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ── OCR ── -->
+        <div class="aitab-content hidden" id="aitab-ocr">
+          <p class="sub-label" style="margin-bottom:1rem">📝 Extract text from any image — screenshots, scanned documents, photos of text.</p>
+          <div class="upload-zone" id="ocr-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop image here</strong> or <label class="link-label" for="ocr-file">browse</label></p>
+            <p class="upload-hint">JPG, PNG, WEBP — clear, high-contrast text gives best results</p>
+            <input type="file" id="ocr-file" accept="image/*" hidden />
+          </div>
+          <div id="ocr-preview" class="preview-box hidden"></div>
+          <div class="form-row two-col" style="margin-top:1rem">
+            <div class="form-group">
+              <label>Language</label>
+              <select id="ocr-lang">
+                <option value="eng">English</option>
+                <option value="hin">Hindi</option>
+                <option value="eng+hin">English + Hindi</option>
+                <option value="fra">French</option>
+                <option value="deu">German</option>
+                <option value="spa">Spanish</option>
+                <option value="chi_sim">Chinese (Simplified)</option>
+                <option value="ara">Arabic</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="ocr-btn" disabled style="margin-top:0.5rem">
+            <span class="btn-icon">📝</span> Extract Text
+          </button>
+          <div id="ocr-status" class="status-msg hidden"></div>
+          <!-- Result area -->
+          <div id="ocr-result-wrap" class="hidden" style="margin-top:1.25rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+              <span class="sub-label" id="ocr-word-count"></span>
+              <div style="display:flex;gap:0.5rem">
+                <button class="btn btn-sm" id="ocr-copy-btn">📋 Copy</button>
+                <button class="btn btn-sm" id="ocr-dl-btn">⬇️ Download .txt</button>
+              </div>
+            </div>
+            <textarea id="ocr-text-area" class="ocr-textarea" readonly placeholder="Extracted text will appear here..."></textarea>
+          </div>
+        </div>
+
+        <!-- ── PDF → Text ── -->
+        <div class="aitab-content hidden" id="aitab-pdf-text">
+          <p class="sub-label" style="margin-bottom:1rem">📄 Extract all text from a PDF — works on digital PDFs instantly. For scanned PDFs use OCR above.</p>
+          <div class="upload-zone" id="pt-drop">
+            <div class="upload-icon">📁</div>
+            <p><strong>Drop PDF here</strong> or <label class="link-label" for="pt-file">browse</label></p>
+            <p class="upload-hint">PDF file — up to 50 MB</p>
+            <input type="file" id="pt-file" accept=".pdf,application/pdf" hidden />
+          </div>
+          <div id="pt-info" class="pdf-info-bar hidden"></div>
+          <div class="form-row two-col" style="margin-top:1rem">
+            <div class="form-group">
+              <label>Pages (blank = all)</label>
+              <input type="text" id="pt-pages" placeholder="e.g. 1-5 or 1,3,7" />
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:0.1rem">
+              <label class="checkbox-label">
+                <input type="checkbox" id="pt-labels" checked />
+                <span>Include page labels</span>
+              </label>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="pt-btn" disabled style="margin-top:0.25rem">
+            <span class="btn-icon">📄</span> Extract Text
+          </button>
+          <div id="pt-status" class="status-msg hidden"></div>
+          <!-- Result area -->
+          <div id="pt-result-wrap" class="hidden" style="margin-top:1.25rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+              <span class="sub-label" id="pt-word-count"></span>
+              <div style="display:flex;gap:0.5rem">
+                <button class="btn btn-sm" id="pt-copy-btn">📋 Copy</button>
+                <button class="btn btn-sm" id="pt-dl-btn">⬇️ Download .txt</button>
+              </div>
+            </div>
+            <textarea id="pt-text-area" class="ocr-textarea" readonly placeholder="Extracted text will appear here..."></textarea>
+          </div>
+        </div>
+
+        <!-- ── Dress Swap / Virtual Try-On ── -->
+        <div class="aitab-content hidden" id="aitab-dress-swap">
+          <p class="tool-desc">Upload a <strong>person photo</strong> and a <strong>garment / dress image</strong>. AI will dress the person in the new outfit using virtual try-on technology. <strong>100% free</strong> — powered by IDM-VTON &amp; CatVTON (3 independent AI spaces tried automatically to maximise availability).</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+            <!-- Person photo -->
+            <div>
+              <label class="sub-label" style="display:block;margin-bottom:.5rem">📸 Person Photo</label>
+              <div class="upload-zone" id="ds-person-drop" style="min-height:160px">
+                <div class="upload-icon">🧍</div>
+                <p><strong>Drop person photo</strong> or <label class="link-label" for="ds-person-file">browse</label></p>
+                <p class="upload-hint">Full body photo works best</p>
+                <input type="file" id="ds-person-file" accept="image/*" hidden />
+              </div>
+              <div id="ds-person-preview" class="preview-box hidden" style="margin-top:.5rem"></div>
+            </div>
+            <!-- Garment image -->
+            <div>
+              <label class="sub-label" style="display:block;margin-bottom:.5rem">👗 Dress / Garment Image</label>
+              <div class="upload-zone" id="ds-garment-drop" style="min-height:160px">
+                <div class="upload-icon">👗</div>
+                <p><strong>Drop garment image</strong> or <label class="link-label" for="ds-garment-file">browse</label></p>
+                <p class="upload-hint">Flat-lay or on-hanger photo works best</p>
+                <input type="file" id="ds-garment-file" accept="image/*" hidden />
+              </div>
+              <div id="ds-garment-preview" class="preview-box hidden" style="margin-top:.5rem"></div>
+            </div>
+          </div>
+
+          <!-- Options -->
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-top:1rem">
+            <div>
+              <label class="sub-label">Garment description (optional)</label>
+              <input type="text" id="ds-desc" placeholder="e.g. red floral dress, blue jeans, white shirt…"
+                style="width:280px;padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border,#333);background:var(--bg,#141420);color:inherit;font-size:.9rem" />
+            </div>
+            <div>
+              <label class="sub-label">Category</label>
+              <select id="ds-category" style="padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border,#333);background:var(--surface,#1e1e2e);color:inherit;font-size:.9rem">
+                <option value="upper_body">Upper Body (shirt, jacket…)</option>
+                <option value="lower_body">Lower Body (pants, skirt…)</option>
+                <option value="dresses" selected>Full Dress / One-piece</option>
+              </select>
+            </div>
+            <div>
+              <label class="sub-label">Quality</label>
+              <select id="ds-quality" style="padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border,#333);background:var(--surface,#1e1e2e);color:inherit;font-size:.9rem">
+                <option value="high" selected>🌟 High (slower, sharper)</option>
+                <option value="standard">⚡ Standard (faster)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="ds-btn" disabled>
+              <span class="btn-icon">👗</span> Swap Dress
+            </button>
+            <span style="font-size:.82rem;color:#64748b">High quality: ~60–90s &nbsp;|&nbsp; Standard: ~30–50s</span>
+          </div>
+          <div id="ds-status" class="status-msg hidden"></div>
+
+          <!-- Result -->
+          <div id="ds-result" class="hidden" style="margin-top:1.25rem">
+            <div class="sub-label" style="margin-bottom:.5rem">✅ Result</div>
+            <img id="ds-result-img" src="" alt="Dress swap result"
+              style="max-width:420px;width:100%;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4)" />
+            <div style="margin-top:.75rem">
+              <a id="ds-download-btn" href="#" download="dress_swap_result.png" class="btn btn-primary">
+                <span class="btn-icon">⬇️</span> Download Result
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    </section>
+
+  </main>
+
+  <!-- ── Signature Draw Modal (fixed overlay — stays outside main) ── -->
+  <div id="sig-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:#1e1e2e;border-radius:16px;padding:1.5rem;max-width:520px;width:95%;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+      <h3 style="margin:0 0 1rem;color:#f1f5f9">✍️ Draw Your Signature</h3>
+      <canvas id="sig-canvas" width="460" height="160"
+        style="border:2px dashed #444;border-radius:8px;background:#fff;cursor:crosshair;touch-action:none;display:block;width:100%"></canvas>
+      <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-sm" id="sig-clear-btn">🗑️ Clear</button>
+        <div style="display:flex;align-items:center;gap:0.4rem">
+          <label style="font-size:0.8rem;color:#94a3b8">Pen:</label>
+          <input type="range" id="sig-pen-width" min="1" max="10" value="3" style="width:80px" />
+        </div>
+        <div style="margin-left:auto;display:flex;gap:0.5rem">
+          <button class="btn btn-primary" id="sig-confirm-btn">✅ Place Signature</button>
+          <button class="btn btn-sm" id="sig-cancel-btn">✖ Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ░░ SEO CONTENT BLOCK ░░ -->
+  <section style="background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);padding:3rem 1.5rem;margin-top:2rem">
+    <div style="max-width:900px;margin:0 auto;color:#64748b;font-size:.9rem;line-height:1.9">
+      <h2 style="color:#94a3b8;font-size:1.2rem;margin-bottom:1rem">Free PDF Form Filler &amp; PDF Editor — No Adobe, No Sign-up</h2>
+      <p>EditPDFForm is your free online PDF form filler and PDF editor. Whether you need to <strong style="color:#94a3b8">fill a PDF form online</strong>, <strong style="color:#94a3b8">edit PDF text</strong>, <strong style="color:#94a3b8">add a signature to a PDF</strong>, or simply merge and compress PDFs — everything works right in your browser without Adobe Acrobat and without creating an account.</p>
+      <p>Common uses: filling government application forms, job application PDFs, passport forms, bank KYC forms, SSC/UPSC exam forms, rental agreements, insurance documents and more. Our <strong style="color:#94a3b8">PDF form filler</strong> works with both interactive PDF forms and flat/scanned PDFs — just click anywhere and type.</p>
+      <p>Beyond PDF editing, EditPDFForm also offers free image tools: compress JPG to 50KB, resize images to exact dimensions, convert between JPG/PNG/WEBP/HEIC formats, make passport-size photos, and remove image backgrounds using AI.</p>
+      <div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:.5rem">
+        <a href="/fill-pdf-form-online" style="color:#6366f1;text-decoration:none;font-size:.82rem">Fill PDF Form Online →</a>
+        <span style="color:#334155">·</span>
+        <a href="/edit-pdf-online" style="color:#6366f1;text-decoration:none;font-size:.82rem">Edit PDF Online →</a>
+        <span style="color:#334155">·</span>
+        <a href="/sign-pdf-online" style="color:#6366f1;text-decoration:none;font-size:.82rem">Sign PDF Online →</a>
+        <span style="color:#334155">·</span>
+        <a href="/merge-pdf" style="color:#6366f1;text-decoration:none;font-size:.82rem">Merge PDF →</a>
+        <span style="color:#334155">·</span>
+        <a href="/compress-jpg-to-50kb" style="color:#6366f1;text-decoration:none;font-size:.82rem">Compress Image →</a>
+        <span style="color:#334155">·</span>
+        <a href="/passport-photo-maker" style="color:#6366f1;text-decoration:none;font-size:.82rem">Passport Photo →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" itemscope itemtype="https://schema.org/WPFooter">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div style="font-size:1.1rem;font-weight:800;color:#f1f5f9;margin-bottom:.6rem">⚡ EditPDFForm</div>
+        <p style="font-size:.82rem;color:#475569;line-height:1.7;margin:0">Free online image &amp; PDF tools.<br>No sign-up. Files deleted after download.<br>100% free forever.</p>
+        <div style="margin-top:.9rem;display:flex;gap:.5rem;flex-wrap:wrap">
+          <a href="/about"          style="font-size:.78rem;color:#6366f1;text-decoration:none">About</a>
+          <a href="/contact"        style="font-size:.78rem;color:#6366f1;text-decoration:none">Contact</a>
+          <a href="/privacy-policy" style="font-size:.78rem;color:#6366f1;text-decoration:none">Privacy</a>
+          <a href="/terms-of-service" style="font-size:.78rem;color:#6366f1;text-decoration:none">Terms</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Image Tools</h4>
+        <ul>
+          <li><a href="/#convert">Image Converter</a></li>
+          <li><a href="/compress-jpg-to-50kb">Compress to 50KB</a></li>
+          <li><a href="/resize-image-to-200x200">Resize Image</a></li>
+          <li><a href="/#crop">Crop &amp; Rotate</a></li>
+          <li><a href="/#edit">Edit &amp; Effects</a></li>
+          <li><a href="/#addtext">Add Text / Watermark</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>PDF Tools</h4>
+        <ul>
+          <li><a href="/fill-pdf-form-online" style="color:#818cf8;font-weight:600">Fill PDF Form Online ⭐</a></li>
+          <li><a href="/edit-pdf-online" style="color:#818cf8;font-weight:600">Edit PDF Online ⭐</a></li>
+          <li><a href="/sign-pdf-online">Sign PDF Online</a></li>
+          <li><a href="/merge-pdf">Merge PDF</a></li>
+          <li><a href="/jpg-to-pdf">JPG to PDF</a></li>
+          <li><a href="/pdf-to-jpg">PDF to JPG</a></li>
+          <li><a href="/#pdf-tools">Split / Compress PDF</a></li>
+          <li><a href="/#pdf-editor">PDF Editor</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>More Tools</h4>
+        <ul>
+          <li><a href="/passport-photo-maker">Passport Photo Maker</a></li>
+          <li><a href="/#india">Signature Resize</a></li>
+          <li><a href="/#india">Govt Form Compress</a></li>
+          <li><a href="/#ai-tools">Remove Background</a></li>
+          <li><a href="/#ai-tools">Upscale Image</a></li>
+          <li><a href="/#ai-tools">OCR – Image to Text</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 EditPDFForm — Free PDF Form Filler &amp; PDF Editor online. Fill, edit, sign PDFs free. No tracking. No watermarks.</p>
+      <p>Built with ❤️ using Python · <a href="/sitemap.xml" style="color:#475569">Sitemap</a></p>
+    </div>
+  </footer>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script>
+    // Mobile hamburger
+    const _nt = document.getElementById('nav-toggle');
+    const _nl = document.getElementById('nav-links');
+    if (_nt && _nl) {
+      _nt.addEventListener('click', () => {
+        const open = _nl.classList.toggle('open');
+        _nt.setAttribute('aria-expanded', open);
+        _nt.textContent = open ? '✕' : '☰';
+      });
+      // Close on link click
+      _nl.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        _nl.classList.remove('open');
+        _nt.setAttribute('aria-expanded', false);
+        _nt.textContent = '☰';
+      }));
+    }
+  </script>
+</body>
+</html>
+
+
+

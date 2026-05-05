@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Merge PDF Files Online Free | EditPDFForm{% endblock %}
+{% block description %}Merge multiple PDF files into one online free. Combine PDF documents instantly — no sign-up, no watermark. Drag, reorder and download your merged PDF.{% endblock %}
+{% block keywords %}merge pdf, combine pdf files, join pdf online free, merge pdf documents, pdf merger, combine multiple pdfs into one{% endblock %}
+{% block canonical_path %}/merge-pdf{% endblock %}
+{% block og_title %}Merge PDF Files Free Online | EditPDFForm{% endblock %}
+{% block og_desc %}Combine multiple PDF files into one document instantly. Free, no sign-up, no watermark. Upload, arrange and merge PDFs online.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication",
+ "name":"PDF Merger","applicationCategory":"UtilitiesApplication",
+ "operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+ "description":"Merge multiple PDF files into one document online for free. No sign-up required."}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">Unlimited PDFs · Free · Instant</div>
+  <h1>Merge PDF Files Online</h1>
+  <p>Combine two or more PDF documents into a single PDF file instantly. Free, no sign-up, no watermark. Upload, arrange order, and download.</p>
+  <a href="/#pdf-tools" class="btn btn-primary" style="margin-top:.5rem"><span class="btn-icon">🔗</span> Merge PDFs Now</a>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:2.5rem 1.5rem">
+  <h2 style="color:#f1f5f9;font-size:1.4rem">How to Merge PDF Files</h2>
+  <ol style="color:#94a3b8;line-height:2.2;padding-left:1.4rem">
+    <li>Click <strong style="color:#f1f5f9">Merge PDFs Now</strong> → scroll to PDF Tools → Organise → Merge</li>
+    <li>Upload two or more PDF files (files merge in upload order)</li>
+    <li>Click <strong style="color:#f1f5f9">Merge PDFs</strong></li>
+    <li>Your merged PDF downloads automatically</li>
+  </ol>
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Frequently Asked Questions</h2>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Is there a limit on number of PDFs I can merge?</summary>
+    <p style="margin:.75rem 0 0">No hard limit. You can merge as many PDFs as needed, up to the 50MB per-file upload limit.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Will the merged PDF retain bookmarks and links?</summary>
+    <p style="margin:.75rem 0 0">Basic text and images are fully preserved. Complex interactive elements like forms and bookmarks may be simplified in the merged output.</p>
+  </details>
+</div>
+{% endblock %}
+

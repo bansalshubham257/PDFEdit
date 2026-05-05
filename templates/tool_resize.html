@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Resize Image to 200x200 Pixels – Free Online | EditPDFForm{% endblock %}
+{% block description %}Resize any image to exact pixel dimensions like 200x200, 300x300, 1920x1080 online free. Maintain aspect ratio or set custom width and height. No sign-up.{% endblock %}
+{% block keywords %}resize image to 200x200, resize image online free, image resizer pixels, crop image to exact size, resize photo to specific dimensions, image resize tool{% endblock %}
+{% block canonical_path %}/resize-image-to-200x200{% endblock %}
+{% block og_url %}/resize-image-to-200x200{% endblock %}
+{% block og_title %}Resize Image to 200×200 Free | EditPDFForm{% endblock %}
+{% block og_desc %}Resize images to any pixel size — 200x200, 1080x1080, custom dimensions. Free online image resizer with presets. No sign-up.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication",
+ "name":"Image Resizer","applicationCategory":"UtilitiesApplication",
+ "operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+ "description":"Resize images to exact pixel dimensions online. Supports custom sizes, percentage resize, and preset dimensions."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"How do I resize an image to 200x200 pixels?","acceptedAnswer":{"@type":"Answer","text":"Upload your image, choose 'Dimensions' mode, enter 200 for width and 200 for height, uncheck 'Keep ratio' if needed, and click Resize Image."}},
+  {"@type":"Question","name":"Can I resize without losing quality?","acceptedAnswer":{"@type":"Answer","text":"Enlarging an image always involves some quality loss. Reducing size generally preserves quality well. EditPDFForm uses Lanczos resampling for the sharpest results."}},
+  {"@type":"Question","name":"What preset sizes are available?","acceptedAnswer":{"@type":"Answer","text":"EditPDFForm includes presets for HD (1280x720), Full HD (1920x1080), 4K (3840x2160), Instagram (1080x1080), Twitter header, Facebook cover and many more."}}
+]}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">Exact Pixels · Presets · Free</div>
+  <h1>Resize Image to 200×200</h1>
+  <p>Resize any image to exact pixel dimensions — 200×200, 300×300, 1920×1080, or any custom size. Presets for social media included. Free, instant, no watermark.</p>
+  <a href="/#resize" class="btn btn-primary" style="margin-top:.5rem"><span class="btn-icon">📐</span> Resize Now</a>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:2.5rem 1.5rem">
+  <h2 style="color:#f1f5f9;font-size:1.4rem">How to Resize an Image</h2>
+  <ol style="color:#94a3b8;line-height:2.2;padding-left:1.4rem">
+    <li>Click <strong style="color:#f1f5f9">Resize Now</strong> and scroll to the Resize section</li>
+    <li>Upload your image</li>
+    <li>Choose <strong style="color:#f1f5f9">Dimensions</strong> and enter 200 × 200 (or any size you need)</li>
+    <li>Toggle <strong style="color:#f1f5f9">Keep Ratio</strong> on or off as required</li>
+    <li>Click <strong style="color:#f1f5f9">Resize Image</strong></li>
+  </ol>
+
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Available Resize Modes</h2>
+  <div class="tools-grid" style="padding:0">
+    <div class="tool-card-link" style="cursor:default"><div class="tc-icon">📏</div><h3>Custom Dimensions</h3><p>Enter exact width and height in pixels with optional aspect ratio lock</p></div>
+    <div class="tool-card-link" style="cursor:default"><div class="tc-icon">%</div><h3>Percentage Resize</h3><p>Reduce or enlarge by a percentage — e.g. 50% to halve the dimensions</p></div>
+    <div class="tool-card-link" style="cursor:default"><div class="tc-icon">📱</div><h3>Social Media Presets</h3><p>Instagram, Twitter, Facebook, HD, Full HD, 4K and more — one click</p></div>
+  </div>
+
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Frequently Asked Questions</h2>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">How do I resize to exactly 200×200?</summary>
+    <p style="margin:.75rem 0 0">Select Dimensions mode, enter 200 for both width and height, and turn off "Keep ratio" if your image isn't square. Click Resize Image.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Will resizing change the file format?</summary>
+    <p style="margin:.75rem 0 0">No. The output keeps the same format as your input (JPG stays JPG, PNG stays PNG etc.).</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Can I resize multiple images at once?</summary>
+    <p style="margin:.75rem 0 0">Currently each image is resized individually. Batch resize is on our roadmap.</p>
+  </details>
+</div>
+{% endblock %}
+

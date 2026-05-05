@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>{% block title %}EditPDFForm – Edit PDF Online, Fill PDF Forms Free | Image & PDF Tools{% endblock %}</title>
+  <meta name="description" content="{% block description %}EditPDFForm: Free online PDF editor — fill PDF forms, add text to PDF, sign PDF, merge PDF and edit PDF files instantly. Also compress, resize & convert images. No sign-up required.{% endblock %}" />
+  <meta name="keywords" content="{% block keywords %}fill pdf form online, edit pdf online, pdf editor free, pdf form filler, fill and sign pdf, add text to pdf, type on pdf, pdf annotator, online pdf editor no sign up, edit pdf without adobe, sign pdf online free, fill pdf form online free, pdf filler, pdf writer, fill in pdf form, edit pdf text online, free pdf form filler, pdf editor tool, compress pdf, merge pdf, jpg to pdf, image converter, compress image, resize image, passport photo, remove background, free online tools{% endblock %}" />
+  <meta name="author" content="EditPDFForm" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{{ config.SITE_URL }}{% block canonical_path %}/{% endblock %}" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="EditPDFForm" />
+  <meta property="og:title"       content="{% block og_title %}EditPDFForm – Free PDF Editor & Form Filler Online{% endblock %}" />
+  <meta property="og:description" content="{% block og_desc %}Fill PDF forms, add text to PDF, sign PDF and edit PDF files online for free. No sign-up. No Adobe required. Works in your browser instantly.{% endblock %}" />
+  <meta property="og:image"       content="{{ config.SITE_URL }}/static/og-image.png" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url"         content="{{ config.SITE_URL }}{% block og_url %}/{% endblock %}" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="{% block tw_title %}EditPDFForm – Free PDF Editor & Form Filler Online{% endblock %}" />
+  <meta name="twitter:description" content="{% block tw_desc %}Fill PDF forms, edit PDF text, add signatures online — free, no sign-up, no Adobe needed.{% endblock %}" />
+  <meta name="twitter:image"       content="{{ config.SITE_URL }}/static/og-image.png" />
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "EditPDFForm",
+    "url": "{{ config.SITE_URL }}",
+    "description": "Free online PDF editor — fill PDF forms, add text to PDF, sign PDF, merge PDF. Also compress, resize and convert images.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{ config.SITE_URL }}/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "EditPDFForm PDF Editor",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    "description": "Fill PDF forms online, edit PDF text, add signatures and annotations — free, no sign-up, no Adobe required.",
+    "featureList": "Fill PDF forms, Edit PDF text, Sign PDF online, Merge PDF, Compress PDF, PDF to JPG, JPG to PDF"
+  }
+  </script>
+  {% block extra_schema %}{% endblock %}
+
+  <!-- Fonts & Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  {% block extra_head %}{% endblock %}
+
+  <style>
+    /* ── Shared extra styles ── */
+    .page-hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:4rem 1.5rem 3rem;text-align:center}
+    .page-hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin:0 0 .75rem;color:#f1f5f9}
+    .page-hero p{font-size:1.05rem;color:#94a3b8;max-width:600px;margin:0 auto 1.5rem}
+    .page-hero .badge{display:inline-block;background:rgba(99,102,241,.18);color:#a5b4fc;border:1px solid rgba(99,102,241,.35);border-radius:20px;padding:.3rem .9rem;font-size:.78rem;font-weight:600;margin-bottom:1rem;letter-spacing:.04em}
+    .static-page{max-width:820px;margin:0 auto;padding:3rem 1.5rem 5rem;line-height:1.8;color:#cbd5e1}
+    .static-page h2{color:#f1f5f9;font-size:1.4rem;margin-top:2rem}
+    .static-page h3{color:#e2e8f0;font-size:1.1rem;margin-top:1.5rem}
+    .static-page a{color:#818cf8}
+    .tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;max-width:1200px;margin:2rem auto;padding:0 1rem}
+    .tool-card-link{text-decoration:none;display:block;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:1.25rem 1.5rem;transition:all .2s;color:#f1f5f9}
+    .tool-card-link:hover{border-color:#6366f1;background:rgba(99,102,241,.1);transform:translateY(-2px)}
+    .tool-card-link .tc-icon{font-size:2rem;margin-bottom:.5rem}
+    .tool-card-link h3{font-size:1rem;font-weight:700;margin:0 0 .3rem}
+    .tool-card-link p{font-size:.82rem;color:#94a3b8;margin:0}
+    /* Hamburger nav */
+    .nav-toggle{display:none;background:none;border:none;color:#f1f5f9;font-size:1.5rem;cursor:pointer;padding:.25rem}
+    @media(max-width:768px){
+      .nav-links{display:none;flex-direction:column;position:absolute;top:56px;left:0;right:0;background:#0f0f1a;padding:.75rem 1rem;gap:.25rem;z-index:200;border-bottom:1px solid rgba(255,255,255,.08)}
+      .nav-links.open{display:flex}
+      .nav-toggle{display:block}
+      .nav-inner{flex-wrap:wrap;position:relative}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ░░ NAV ░░ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/">
+        <span class="brand-icon">⚡</span>
+        <span>EditPDFForm</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">☰</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/fill-pdf-form-online" style="color:#a5b4fc;font-weight:600">📋 Fill PDF Form</a></li>
+        <li><a href="/edit-pdf-online" style="color:#a5b4fc;font-weight:600">✏️ Edit PDF</a></li>
+        <li><a href="/sign-pdf-online">✍️ Sign PDF</a></li>
+        <li><a href="/#pdf-tools">📄 PDF Tools</a></li>
+        <li><a href="/#convert">🔄 Convert</a></li>
+        <li><a href="/#compress">🗜 Compress</a></li>
+        <li><a href="/#resize">📐 Resize</a></li>
+        <li><a href="/#india">🇮🇳 India Forms</a></li>
+        <li><a href="/#ai-tools">🤖 AI Tools</a></li>
+        <li class="nav-sep"><a href="/about">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <div style="max-width:1100px;margin:0 auto;padding:0 1rem">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;padding:2.5rem 0 1.5rem;text-align:left">
+        <div>
+          <div style="font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:.5rem">⚡ EditPDFForm</div>
+          <p style="font-size:.83rem;color:#64748b;line-height:1.7">Free online image and PDF tools.<br>No sign-up. No uploads stored.<br>Files deleted after download.</p>
+        </div>
+        <div>
+          <div style="font-size:.85rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">Image Tools</div>
+          <ul style="list-style:none;padding:0;margin:0;font-size:.83rem;color:#64748b;line-height:2">
+            <li><a href="/jpg-to-pdf" style="color:#64748b;text-decoration:none;hover:color:#818cf8">JPG to PDF</a></li>
+            <li><a href="/compress-jpg-to-50kb" style="color:#64748b;text-decoration:none">Compress Image</a></li>
+            <li><a href="/resize-image-to-200x200" style="color:#64748b;text-decoration:none">Resize Image</a></li>
+            <li><a href="/passport-photo-maker" style="color:#64748b;text-decoration:none">Passport Photo</a></li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:.85rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">PDF Tools</div>
+          <ul style="list-style:none;padding:0;margin:0;font-size:.83rem;color:#64748b;line-height:2">
+            <li><a href="/fill-pdf-form-online" style="color:#818cf8;text-decoration:none;font-weight:600">Fill PDF Form Online ⭐</a></li>
+            <li><a href="/edit-pdf-online" style="color:#818cf8;text-decoration:none;font-weight:600">Edit PDF Online ⭐</a></li>
+            <li><a href="/sign-pdf-online" style="color:#64748b;text-decoration:none">Sign PDF Online</a></li>
+            <li><a href="/merge-pdf" style="color:#64748b;text-decoration:none">Merge PDF</a></li>
+            <li><a href="/pdf-to-jpg" style="color:#64748b;text-decoration:none">PDF to JPG</a></li>
+            <li><a href="/#pdf-editor" style="color:#64748b;text-decoration:none">PDF Editor</a></li>
+            <li><a href="/#pdf-tools" style="color:#64748b;text-decoration:none">All PDF Tools</a></li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:.85rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">Company</div>
+          <ul style="list-style:none;padding:0;margin:0;font-size:.83rem;color:#64748b;line-height:2">
+            <li><a href="/about" style="color:#64748b;text-decoration:none">About</a></li>
+            <li><a href="/contact" style="color:#64748b;text-decoration:none">Contact</a></li>
+            <li><a href="/privacy-policy" style="color:#64748b;text-decoration:none">Privacy Policy</a></li>
+            <li><a href="/terms-of-service" style="color:#64748b;text-decoration:none">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,.07);padding:1.25rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
+        <p style="color:#475569;font-size:.8rem;margin:0">© 2025 EditPDFForm. All tools are free to use.</p>
+        <p style="color:#475569;font-size:.8rem;margin:0">Built with ❤️ — No tracking · No sign-up · Privacy first</p>
+      </div>
+    </div>
+  </footer>
+
+  {% block extra_scripts %}{% endblock %}
+  <script>
+    // Hamburger menu
+    const navToggle = document.getElementById('nav-toggle');
+    const navLinks  = document.getElementById('nav-links');
+    if (navToggle) navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Sign PDF Online Free – Add Digital Signature to PDF | EditPDFForm{% endblock %}
+{% block description %}Sign PDF online for free. Draw your handwritten signature, type your name as a signature, or upload a signature image and place it on any PDF. No Adobe. No sign-up.{% endblock %}
+{% block keywords %}sign pdf online, sign pdf online free, add signature to pdf, digital signature pdf, pdf signature online, esign pdf free, electronic signature pdf, sign document online free, handwritten signature pdf, typed signature pdf{% endblock %}
+{% block canonical_path %}/sign-pdf-online{% endblock %}
+{% block og_url %}/sign-pdf-online{% endblock %}
+{% block og_title %}Sign PDF Online Free – EditPDFForm{% endblock %}
+{% block og_desc %}Draw or type your signature and add it to any PDF online. Free, no sign-up, no Adobe needed.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I sign a PDF online for free?",
+      "acceptedAnswer": {"@type":"Answer","text":"Upload your PDF to EditPDFForm, open the PDF Editor, click the signature tool, draw or type your signature, place it on the page, and download your signed PDF — completely free, no sign-up needed."}
+    },
+    {
+      "@type": "Question",
+      "name": "Is an electronic signature on a PDF legally valid?",
+      "acceptedAnswer": {"@type":"Answer","text":"Electronic signatures are legally valid for most documents in India, the US, EU and many other countries under the IT Act 2000 (India), eIDAS (EU) and ESIGN Act (USA). For contracts requiring wet ink, consult a legal professional."}
+    },
+    {
+      "@type": "Question",
+      "name": "Can I upload my signature image to sign a PDF?",
+      "acceptedAnswer": {"@type":"Answer","text":"Yes — you can upload a PNG or JPG image of your signature (with transparent background) and position it anywhere on your PDF."}
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">✍️ Sign PDF</div>
+  <h1>Sign PDF Online — Free</h1>
+  <p>Draw, type or upload your signature and place it anywhere on a PDF. Download your signed document instantly.</p>
+  <a href="/#pdf-editor" class="btn btn-primary" style="display:inline-block;margin-top:1rem;padding:.75rem 2rem;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:1rem">
+    ✍️ Sign a PDF Now
+  </a>
+</div>
+
+<div class="static-page">
+
+  <h2>Three Ways to Sign Your PDF</h2>
+  <div class="tools-grid" style="margin:1rem 0 2rem">
+    <div class="tool-card-link" style="cursor:default">
+      <div class="tc-icon">✍️</div>
+      <h3>Draw Signature</h3>
+      <p>Use your mouse, trackpad or finger (on mobile) to draw your handwritten signature directly on the PDF.</p>
+    </div>
+    <div class="tool-card-link" style="cursor:default">
+      <div class="tc-icon">🔤</div>
+      <h3>Type Signature</h3>
+      <p>Type your name and choose from several handwriting-style fonts to generate a professional-looking signature.</p>
+    </div>
+    <div class="tool-card-link" style="cursor:default">
+      <div class="tc-icon">🖼️</div>
+      <h3>Upload Signature</h3>
+      <p>Upload a PNG/JPG image of your existing signature and place it on the PDF with perfect positioning.</p>
+    </div>
+  </div>
+
+  <h2>Related Tools</h2>
+  <div class="tools-grid" style="margin:1rem 0">
+    <a href="/fill-pdf-form-online" class="tool-card-link">
+      <div class="tc-icon">📋</div>
+      <h3>Fill PDF Form</h3>
+      <p>Fill out PDF forms — type in fields, tick checkboxes.</p>
+    </a>
+    <a href="/edit-pdf-online" class="tool-card-link">
+      <div class="tc-icon">✏️</div>
+      <h3>Edit PDF Online</h3>
+      <p>Add text, images and shapes to any PDF.</p>
+    </a>
+    <a href="/merge-pdf" class="tool-card-link">
+      <div class="tc-icon">📎</div>
+      <h3>Merge PDF</h3>
+      <p>Combine multiple PDFs into one file.</p>
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+

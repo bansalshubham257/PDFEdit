@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}JPG to PDF Converter – Free Online | EditPDFForm{% endblock %}
+{% block description %}Convert JPG images to PDF online free. Combine multiple JPG, PNG, WEBP photos into one PDF file instantly. No sign-up, no watermark.{% endblock %}
+{% block keywords %}jpg to pdf, convert jpg to pdf, image to pdf, multiple photos to pdf, jpg to pdf online free, png to pdf{% endblock %}
+{% block canonical_path %}/jpg-to-pdf{% endblock %}
+{% block og_url %}/jpg-to-pdf{% endblock %}
+{% block og_title %}JPG to PDF Converter – Free Online | EditPDFForm{% endblock %}
+{% block og_desc %}Convert JPG, PNG, WEBP images to PDF for free. Combine multiple photos into one PDF. No sign-up required.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org","@type":"SoftwareApplication",
+  "name":"JPG to PDF Converter","applicationCategory":"UtilitiesApplication",
+  "operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"Convert JPG images to PDF online free. Combine multiple photos into a single PDF instantly."
+}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Can I convert multiple JPG files to one PDF?","acceptedAnswer":{"@type":"Answer","text":"Yes. Upload multiple JPG (or PNG, WEBP) files and EditPDFForm will combine them all into a single PDF in the order you upload them."}},
+  {"@type":"Question","name":"Is JPG to PDF conversion free?","acceptedAnswer":{"@type":"Answer","text":"Completely free. No sign-up, no watermarks, no hidden fees."}},
+  {"@type":"Question","name":"What image formats can I convert to PDF?","acceptedAnswer":{"@type":"Answer","text":"JPG, JPEG, PNG, WEBP, BMP, TIFF and HEIC are all supported."}}
+]}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">Free · No sign-up · Instant</div>
+  <h1>JPG to PDF Converter</h1>
+  <p>Convert one or multiple JPG, PNG, WEBP images into a single PDF file — free and instant. No watermarks, no registration.</p>
+  <a href="/#pdf-tools" class="btn btn-primary" style="margin-top:.5rem"><span class="btn-icon">🚀</span> Use Tool Now</a>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:2.5rem 1.5rem">
+  <h2 style="color:#f1f5f9;font-size:1.4rem">How to Convert JPG to PDF</h2>
+  <ol style="color:#94a3b8;line-height:2.2;padding-left:1.4rem">
+    <li>Click <strong style="color:#f1f5f9">"Use Tool Now"</strong> and scroll to the PDF Tools section</li>
+    <li>Select the <strong style="color:#f1f5f9">Images → PDF</strong> tab</li>
+    <li>Upload one or multiple JPG / PNG / WEBP images</li>
+    <li>Click <strong style="color:#f1f5f9">Convert to PDF</strong> — your download starts immediately</li>
+  </ol>
+
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Why Use EditPDFForm JPG to PDF?</h2>
+  <div class="tools-grid" style="padding:0">
+    <div class="tool-card-link" style="cursor:default">
+      <div class="tc-icon">⚡</div>
+      <h3>Instant Conversion</h3>
+      <p>Convert multiple images to PDF in seconds — no waiting, no queue</p>
+    </div>
+    <div class="tool-card-link" style="cursor:default">
+      <div class="tc-icon">🔒</div>
+      <h3>Private & Secure</h3>
+      <p>Files are deleted immediately after download. We never store your images.</p>
+    </div>
+    <div class="tool-card-link" style="cursor:default">
+      <div class="tc-icon">🆓</div>
+      <h3>100% Free</h3>
+      <p>No subscription, no watermark, no sign-up — completely free forever</p>
+    </div>
+  </div>
+
+  <h2 style="color:#f1f5f9;font-size:1.4rem;margin-top:2.5rem">Frequently Asked Questions</h2>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Can I convert multiple JPG files to one PDF?</summary>
+    <p style="margin:.75rem 0 0">Yes. Upload multiple JPG (or PNG, WEBP) files and EditPDFForm will combine them all into a single PDF in the order you upload them.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Is there a file size limit?</summary>
+    <p style="margin:.75rem 0 0">You can upload files up to 50MB each. There is no limit on the number of images you can combine.</p>
+  </details>
+  <details style="border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.75rem;color:#94a3b8">
+    <summary style="cursor:pointer;color:#f1f5f9;font-weight:600">Will the PDF quality be good?</summary>
+    <p style="margin:.75rem 0 0">Yes. The original image resolution is preserved in the PDF output. No quality loss during conversion.</p>
+  </details>
+</div>
+{% endblock %}
+

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Edit PDF Online Free – Add Text, Images & Annotations | EditPDFForm{% endblock %}
+{% block description %}Edit PDF files online for free. Add text to PDF, insert images, draw shapes, highlight text, annotate pages and download. No Adobe Acrobat. No sign-up required.{% endblock %}
+{% block keywords %}edit pdf online, edit pdf online free, online pdf editor, add text to pdf, pdf editor free no sign up, pdf annotation tool, annotate pdf online, edit pdf without adobe, pdf text editor online, add image to pdf, pdf markup tool, free pdf editor browser{% endblock %}
+{% block canonical_path %}/edit-pdf-online{% endblock %}
+{% block og_url %}/edit-pdf-online{% endblock %}
+{% block og_title %}Edit PDF Online Free – EditPDFForm PDF Editor{% endblock %}
+{% block og_desc %}Add text, images, shapes and annotations to any PDF online. Free PDF editor — no sign-up, no Adobe needed.{% endblock %}
+
+{% block extra_schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How can I edit a PDF online for free?",
+      "acceptedAnswer": {"@type":"Answer","text":"Upload your PDF to EditPDFForm, click anywhere to add text, insert images, draw shapes or add annotations, then click Download to save your edited PDF — all free, no sign-up needed."}
+    },
+    {
+      "@type": "Question",
+      "name": "Can I edit PDF text without Adobe Acrobat?",
+      "acceptedAnswer": {"@type":"Answer","text":"Yes! EditPDFForm is a free browser-based PDF editor that requires no Adobe Acrobat or any software installation."}
+    },
+    {
+      "@type": "Question",
+      "name": "Can I add images to a PDF online?",
+      "acceptedAnswer": {"@type":"Answer","text":"Yes — you can insert images, logos, stamps and photos anywhere on your PDF pages using the EditPDFForm PDF editor."}
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="badge">✏️ PDF Editor</div>
+  <h1>Edit PDF Online — Free</h1>
+  <p>Add text, images, shapes and annotations to any PDF. Download your edited file instantly. No Adobe, no sign-up.</p>
+  <a href="/#pdf-editor" class="btn btn-primary" style="display:inline-block;margin-top:1rem;padding:.75rem 2rem;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:1rem">
+    ✏️ Open PDF Editor
+  </a>
+</div>
+
+<div class="static-page">
+
+  <h2>Free Online PDF Editor — No Adobe Required</h2>
+  <p>EditPDFForm gives you a powerful <strong>free PDF editor</strong> that runs entirely in your browser. Add text anywhere, insert images, draw shapes, highlight important sections, add signatures, and save your edited PDF — all without paying for Adobe Acrobat Pro.</p>
+
+  <h2>What You Can Do with Our PDF Editor</h2>
+  <ul style="line-height:2.2">
+    <li>✏️ <strong>Add text to PDF</strong> — click anywhere and start typing</li>
+    <li>🖼️ <strong>Insert images</strong> — add photos, logos, stamps to any page</li>
+    <li>🖊️ <strong>Draw shapes</strong> — lines, rectangles, circles, arrows</li>
+    <li>🎨 <strong>Highlight text</strong> — mark important information</li>
+    <li>✍️ <strong>Add signature</strong> — draw or type your signature</li>
+    <li>📝 <strong>Fill form fields</strong> — fill interactive and flat PDF forms</li>
+    <li>🗑️ <strong>Delete pages</strong> — remove unwanted pages</li>
+    <li>🔄 <strong>Rotate pages</strong> — fix orientation</li>
+  </ul>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <h3>Is this PDF editor really free?</h3>
+  <p>Yes — 100% free with no sign-up, no watermarks and no hidden fees. All tools on EditPDFForm are free forever.</p>
+
+  <h3>Does editing PDF online require installation?</h3>
+  <p>No installation needed. Everything runs in your web browser — Chrome, Firefox, Safari, Edge — on desktop or mobile.</p>
+
+  <h3>Can I edit scanned PDFs?</h3>
+  <p>You can overlay text, images and annotations on scanned PDFs. For editing the scanned text itself, use the OCR tool to extract text first.</p>
+
+  <h2>Related Tools</h2>
+  <div class="tools-grid" style="margin:1rem 0">
+    <a href="/fill-pdf-form-online" class="tool-card-link">
+      <div class="tc-icon">📋</div>
+      <h3>Fill PDF Form</h3>
+      <p>Fill out PDF forms online — type in fields, tick checkboxes, add signature.</p>
+    </a>
+    <a href="/sign-pdf-online" class="tool-card-link">
+      <div class="tc-icon">✍️</div>
+      <h3>Sign PDF Online</h3>
+      <p>Add your digital signature to any PDF for free.</p>
+    </a>
+    <a href="/merge-pdf" class="tool-card-link">
+      <div class="tc-icon">📎</div>
+      <h3>Merge PDF</h3>
+      <p>Combine multiple PDF files into one.</p>
+    </a>
+    <a href="/compress-pdf" class="tool-card-link">
+      <div class="tc-icon">🗜</div>
+      <h3>Compress PDF</h3>
+      <p>Reduce PDF file size without losing quality.</p>
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
