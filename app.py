@@ -224,6 +224,31 @@ def compress_to_target(img, fmt, target_bytes, quality_start=85):
 def google_verify():
     return 'google-site-verification: googlefdd4ba2b0937db58.html', 200, {'Content-Type': 'text/html'}
 
+# ── Minified script.js — built once at startup ───────────────────
+try:
+    import rjsmin as _rjsmin
+    _script_path = os.path.join(app.static_folder, 'script.js')
+    with open(_script_path, 'r', encoding='utf-8') as _f:
+        _MINIFIED_JS = _rjsmin.jsmin(_f.read())
+    logging.info(f'script.js minified: {len(open(_script_path).read())} → {len(_MINIFIED_JS)} bytes')
+except Exception as _e:
+    _MINIFIED_JS = None
+    logging.warning(f'rjsmin unavailable, serving raw script.js: {_e}')
+
+@app.route('/static/script.js')
+def serve_script_js():
+    from flask import make_response
+    ver = request.args.get('v', '')
+    if _MINIFIED_JS:
+        resp = make_response(_MINIFIED_JS)
+    else:
+        with open(os.path.join(app.static_folder, 'script.js'), 'r') as f:
+            resp = make_response(f.read())
+    resp.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+    resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    resp.headers['ETag'] = _STATIC_VER
+    return resp
+
 @app.route('/')
 def index():
     return render_template('index.html',
