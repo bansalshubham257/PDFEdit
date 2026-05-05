@@ -45,7 +45,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ static_ver }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
   <style>
     /* ── Mobile nav ── */
@@ -230,6 +230,7 @@
               style="width:36px;height:30px;border:none;cursor:pointer;background:transparent" />
           </div>
           <div style="margin-left:auto;display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button class="btn btn-sm" id="pdfed-change-btn">📂 Change PDF</button>
             <button class="btn btn-sm" id="pdfed-undo-btn">↩️ Undo</button>
             <button class="btn btn-sm" id="pdfed-clear-btn">🗑️ Clear All</button>
             <button class="btn btn-primary" id="pdfed-save-btn"><span class="btn-icon">⬇️</span> Download Filled PDF</button>
@@ -931,7 +932,7 @@
               </div>
               <div class="sig-tool-group" style="margin-left:auto">
                 <button class="action-btn" id="sig-undo-btn" title="Undo last stroke">↩ Undo</button>
-                <button class="action-btn" id="sig-clear-btn" title="Clear canvas">🗑 Clear</button>
+                <button class="action-btn" id="india-sig-clear-btn" title="Clear canvas">🗑 Clear</button>
               </div>
             </div>
 
@@ -1798,7 +1799,7 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}?v={{ static_ver }}"></script>
   <script>
     // Mobile hamburger
     const _nt = document.getElementById('nav-toggle');
