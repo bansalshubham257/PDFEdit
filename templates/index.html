@@ -1396,7 +1396,6 @@
           <button class="tab"        data-aitab="cartoon">🎨 Cartoon</button>
           <button class="tab"        data-aitab="ocr">📝 OCR</button>
           <button class="tab"        data-aitab="pdf-text">📄 PDF → Text</button>
-          <button class="tab"        data-aitab="dress-swap">👗 Dress Swap</button>
         </div>
 
         <!-- ── Remove Background ── -->
@@ -1692,81 +1691,6 @@
             <textarea id="pt-text-area" class="ocr-textarea" readonly placeholder="Extracted text will appear here..."></textarea>
           </div>
         </div>
-
-        <!-- ── Dress Swap / Virtual Try-On ── -->
-        <div class="aitab-content hidden" id="aitab-dress-swap">
-          <p class="tool-desc">Upload a <strong>person photo</strong> and a <strong>garment / dress image</strong>. AI will dress the person in the new outfit using virtual try-on technology. <strong>100% free</strong> — powered by IDM-VTON &amp; CatVTON (3 independent AI spaces tried automatically to maximise availability).</p>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
-            <!-- Person photo -->
-            <div>
-              <label class="sub-label" style="display:block;margin-bottom:.5rem">📸 Person Photo</label>
-              <div class="upload-zone" id="ds-person-drop" style="min-height:160px">
-                <div class="upload-icon">🧍</div>
-                <p><strong>Drop person photo</strong> or <label class="link-label" for="ds-person-file">browse</label></p>
-                <p class="upload-hint">Full body photo works best</p>
-                <input type="file" id="ds-person-file" accept="image/*" hidden />
-              </div>
-              <div id="ds-person-preview" class="preview-box hidden" style="margin-top:.5rem"></div>
-            </div>
-            <!-- Garment image -->
-            <div>
-              <label class="sub-label" style="display:block;margin-bottom:.5rem">👗 Dress / Garment Image</label>
-              <div class="upload-zone" id="ds-garment-drop" style="min-height:160px">
-                <div class="upload-icon">👗</div>
-                <p><strong>Drop garment image</strong> or <label class="link-label" for="ds-garment-file">browse</label></p>
-                <p class="upload-hint">Flat-lay or on-hanger photo works best</p>
-                <input type="file" id="ds-garment-file" accept="image/*" hidden />
-              </div>
-              <div id="ds-garment-preview" class="preview-box hidden" style="margin-top:.5rem"></div>
-            </div>
-          </div>
-
-          <!-- Options -->
-          <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-top:1rem">
-            <div>
-              <label class="sub-label">Garment description (optional)</label>
-              <input type="text" id="ds-desc" placeholder="e.g. red floral dress, blue jeans, white shirt…"
-                style="width:280px;padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border,#333);background:var(--bg,#141420);color:inherit;font-size:.9rem" />
-            </div>
-            <div>
-              <label class="sub-label">Category</label>
-              <select id="ds-category" style="padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border,#333);background:var(--surface,#1e1e2e);color:inherit;font-size:.9rem">
-                <option value="upper_body">Upper Body (shirt, jacket…)</option>
-                <option value="lower_body">Lower Body (pants, skirt…)</option>
-                <option value="dresses" selected>Full Dress / One-piece</option>
-              </select>
-            </div>
-            <div>
-              <label class="sub-label">Quality</label>
-              <select id="ds-quality" style="padding:.4rem .7rem;border-radius:8px;border:1px solid var(--border,#333);background:var(--surface,#1e1e2e);color:inherit;font-size:.9rem">
-                <option value="high" selected>🌟 High (slower, sharper)</option>
-                <option value="standard">⚡ Standard (faster)</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
-            <button class="btn btn-primary" id="ds-btn" disabled>
-              <span class="btn-icon">👗</span> Swap Dress
-            </button>
-            <span style="font-size:.82rem;color:#64748b">High quality: ~60–90s &nbsp;|&nbsp; Standard: ~30–50s</span>
-          </div>
-          <div id="ds-status" class="status-msg hidden"></div>
-
-          <!-- Result -->
-          <div id="ds-result" class="hidden" style="margin-top:1.25rem">
-            <div class="sub-label" style="margin-bottom:.5rem">✅ Result</div>
-            <img id="ds-result-img" src="" alt="Dress swap result"
-              style="max-width:420px;width:100%;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4)" />
-            <div style="margin-top:.75rem">
-              <a id="ds-download-btn" href="#" download="dress_swap_result.png" class="btn btn-primary">
-                <span class="btn-icon">⬇️</span> Download Result
-              </a>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
